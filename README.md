@@ -1,4 +1,35 @@
-# 7DRL
-This repo will contain my 7DRL entries.  Each year will be a separate branch.
+# 7DRL 2017
 
-The actual competion work will be on branch ```7DRL{YEAR}``` and any enhancements after the fact will reside in ```7DRL{YEAR}_Updates```
+My entry for the 2017 7DRL is an attempt to create a more traditional roguelike.
+
+__Technology__
+- Atomic Game Engine
+- TypeScript
+- VSCode
+- Atom
+- TSLint
+- ROT.js
+
+
+__Ideas__
+- Basic dungeon generation, maybe using ROT
+- character graphics .. ascii tileset?
+- blueprint library?
+- using some common movement components from prior roguelikes
+- 2D
+- Test using WebView for UI
+- Melee only
+- Be able to switch from Vi keys to Wasd keys?
+- Try to focus on minimal keymap
+- Pick up weapon auto equips if the weapon is better
+- Potions?  should they auto-consume on pickup?
+
+
+## Daily Log
+
+### Day 0 - March 3, 2017
+- Setting up the base project.
+- Configuring the build process
+- Set up the linter using TSLint and using the defaults from --init
+- Configure VSCode to hide generated files, cache, etc.
+
