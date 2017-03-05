@@ -1,41 +1,16 @@
 
-// all blueprints should be defined here
-// This is the base star blueprint that defines the texture, etc.
-export const star = {
-    Star: {},
-    // generate the prefabs into Resources/Prefabs/autogen/stars/..
-    // Note that this value is inherited by all child blueprints and it's possible
-    // to have different directories for differetn types of blueprints
-    prefabDir: "Prefabs/autogen/stars",
+export const entity_base = {
+    prefabDir: "Prefabs/autogen/entities",
     isPrefab: true,
     StaticSprite2D: {
-        sprite: "Sprites/star.png",
+        sprite: "Sprites/PlanetCute/CharacterBoy.png",
         blendMode: Atomic.BlendMode.BLEND_ALPHA
     }
 };
 
-// this descends from the base star and overrides the spawn position and speed
-export const star1 = {
-    inherits: "star",
-    position2D: [-3, 0],
-    Star: {
-        speed: -50
-    }
-};
-
-// this descends from the base star and overrides the spawn position and speed
-export const star2 = {
-    inherits: "star",
-    position2D: [3, 0],
-    Star: {
-        speed: 100
-    }
-};
-
-export const star3 = {
-    inherits: "star",
-    position2D: [3, 0],
-    Star: {
-        speed: 100
+export const entity_player = {
+    inherits: "entity_base",
+    StaticSprite2D: {
+        sprite: "Sprites/PlanetCute/CharacterBoy.png"
     }
 };

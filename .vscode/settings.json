@@ -7,5 +7,6 @@
         "**/*.js.map": true,
         "Cache": true,
         "**/*.asset": true,
-    }
+    },
+    "editor.formatOnSave": true
 }

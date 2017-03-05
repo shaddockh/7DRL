@@ -3,3 +3,4 @@
 
 
 ## Game
+[ ] Add some way to configure the tile offset for an entity.  Maybe part of the entity component

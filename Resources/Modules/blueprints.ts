@@ -1,5 +1,5 @@
 /*
-  Blueprints live here.  You can either defint
+  Blueprints live here.  You can either define
   them in this module by using the format:
 
   
@@ -22,3 +22,4 @@
 */
 
 export * from "./blueprints/entities";
+export * from "./blueprints/tiles";

@@ -1,4 +1,4 @@
-declare module "rot" {
+declare module "Modules/thirdparty/rot" {
 
     module ROT {
 
@@ -31,6 +31,19 @@ declare module "rot" {
             class RecursiveShadowcasting {
                 constructor(callback: (x: number, y: number) => boolean);
             }
+        }
+
+        module RNG {
+            export function clone();
+            export function getNormal(mean, stddev): number;
+            export function getPercentage(): number;
+            export function getSeed(): number;
+            export function getState();
+            export function getUniform(): number;
+            export function getUniformInt(lowerBound, upperBound): number;
+            export function getWeightedValue(data);
+            export function setSeed(seed: number);
+            export function setState(state);
         }
 
         module Map {

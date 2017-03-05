@@ -1,5 +1,5 @@
 /*
-  Blueprints live here.  You can either defint
+  Blueprints live here.  You can either define
   them in this module by using the format:
 
   
@@ -26,4 +26,5 @@ function __export(m) {
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./blueprints/entities"));
+__export(require("./blueprints/tiles"));
 //# sourceMappingURL=blueprints.js.map

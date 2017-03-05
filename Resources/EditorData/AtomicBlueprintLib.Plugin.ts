@@ -1,5 +1,5 @@
 // plugin for generating prefabs from blueprints
-import "Modules/atomic-blueprintlib.bundle";
+import "Modules/thirdparty/atomic-blueprintlib.bundle";
 import * as blueprintLib from "atomic-blueprintlib";
 
 const ExamplePluginUILabel = "Atomic BlueprintLib";

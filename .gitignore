@@ -38,3 +38,6 @@ jspm_packages
 
 # Atomic Game Engine cache
 Cache
+
+#Assets that shouldn't be stored in source control
+Assets
