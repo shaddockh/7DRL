@@ -10,4 +10,10 @@
 	<component type="StaticSprite2D" id="1">
 		<attribute name="Sprite" value="Sprite2D;Sprites/PlanetCute/CharacterBoy.png" />
 	</component>
+	<component type="JSComponent" id="16777216">
+		<attribute name="ComponentFile" value="JSComponentFile;Components/Entity.js" />
+	</component>
+	<component type="JSComponent" id="16777217">
+		<attribute name="ComponentFile" value="JSComponentFile;Components/EntityOrderRenderer.js" />
+	</component>
 </node>

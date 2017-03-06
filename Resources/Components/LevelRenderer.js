@@ -1,4 +1,3 @@
-"atomic component";
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
@@ -11,9 +10,10 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var events = require("Modules/CustomEvents");
 var nodeBuilder = require("atomic-blueprintlib");
+var CustomEvents = require("Modules/CustomEvents");
 var CustomJSComponent_1 = require("Modules/CustomJSComponent");
+"atomic component";
 var LevelRenderer = (function (_super) {
     __extends(LevelRenderer, _super);
     function LevelRenderer() {
@@ -31,44 +31,40 @@ var LevelRenderer = (function (_super) {
         return _this;
     }
     LevelRenderer.prototype.start = function () {
-        var _this = this;
-        this.subscribeToEvent(events.LoadLevelEvent(function (data) { return _this.loadLevel(data); }));
-        this.sendEvent(events.SceneReadyEventData());
-    };
-    LevelRenderer.prototype.update = function (timeStep) {
-        // this.node.rotate2D(timeStep * 75 * this.speed);
-    };
-    LevelRenderer.prototype.loadLevel = function (eventData) {
-        this.DEBUG("Loading new level");
-        this.currentLevel = eventData.level;
-        this.render();
+        this.subscribeToEvent(CustomEvents.RenderCurrentLevelEvent(this.render.bind(this)));
     };
     LevelRenderer.prototype.render = function () {
         var _this = this;
+        this.DEBUG("About to render level");
+        var currentLevel = this.node.scene.getJSComponent("LevelController").currentLevel;
         var start = new Date().getTime();
         try {
             var scaleX_1 = this.gridPixelSizeX * Atomic.PIXEL_SIZE;
             var scaleY_1 = this.gridPixelSizeY * Atomic.PIXEL_SIZE;
-            var offsetX = this.currentLevel.width / 2 * scaleX_1 * -1;
-            var offsetY = this.currentLevel.height / 2 * scaleY_1 * -1;
-            this.currentLevel.iterate(function (x, y, cell) {
+            var offsetX = currentLevel.width / 2 * scaleX_1 * -1;
+            var offsetY = currentLevel.height / 2 * scaleY_1 * -1;
+            currentLevel.iterate(function (x, y, cell) {
                 if (cell.terrainType !== 0 /* empty */) {
                     // this.DEBUG(`Construction cell [${x},${y}] - ${cell.blueprint}`);
                     var tileNode = nodeBuilder.createChildAtPosition(_this.node, cell.blueprint, [x * scaleX_1, y * scaleY_1]);
-                    tileNode.getComponent("StaticSprite2D").orderInLayer = ((_this.currentLevel.height - y) * 4);
+                    tileNode.getComponent("StaticSprite2D").orderInLayer = ((currentLevel.height - y) * 4);
                     _this.childNodes.push(tileNode);
                 }
             });
-            // let's just grab an empty cell and drop a player on it for now..
-            // TODO: move this out
-            var emptyFloor = this.currentLevel.findEmptyFloorCell();
-            var scaleYChar = (this.gridPixelSizeY) * Atomic.PIXEL_SIZE;
-            var yOffset = 40 * Atomic.PIXEL_SIZE;
-            var playerNode = nodeBuilder.createChildAtPosition(this.node, "entity_player", [emptyFloor.x * scaleX_1, emptyFloor.y * scaleYChar + yOffset]);
-            // playerNode.getComponent<Atomic.StaticSprite2D>("StaticSprite2D").orderInLayer = this.currentLevel.height - emptyFloor.y;
-            playerNode.getComponent("StaticSprite2D").orderInLayer = ((this.currentLevel.height - emptyFloor.y) * 4) + 2;
-            this.DEBUG("Placing player at " + emptyFloor.x + "," + emptyFloor.y);
-            this.childNodes.push(playerNode);
+            var scaleYChar_1 = (this.gridPixelSizeY) * Atomic.PIXEL_SIZE;
+            var yOffset_1 = 40 * Atomic.PIXEL_SIZE;
+            currentLevel.entities.forEach(function (e, index) {
+                _this.DEBUG("About to construct entity: " + e.blueprint);
+                var entityNode = nodeBuilder.createChildAtPosition(_this.node, e.blueprint, [e.gridPosition[0] * scaleX_1, e.gridPosition[1] * scaleYChar_1 + yOffset_1]);
+                currentLevel.entities.replaceAt(index, entityNode.getJSComponent("Entity"));
+                entityNode.getComponent("StaticSprite2D").orderInLayer = ((currentLevel.height - e.gridPosition[1]) * 4) + 2;
+                // TODO: this should be less coupled.. maybe send a message
+                if (e.blueprint == "entity_player") {
+                    entityNode.getJSComponent("GridMover").subscribeToMovementController(_this.node.scene.getJSComponent("PlayerInputHandler"));
+                }
+                entityNode.getJSComponent("GridMover").gridPosition = e.gridPosition;
+                _this.childNodes.push(entityNode);
+            });
             this.node.position2D = [offsetX, offsetY];
             this.DEBUG("Changing zoom level from: " + this.node.scene.getMainCamera().zoom + " to " + this.zoom);
             this.node.scene.getMainCamera().zoom = this.zoom;

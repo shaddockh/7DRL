@@ -4,3 +4,9 @@
 
 ## Game
 [ ] Add some way to configure the tile offset for an entity.  Maybe part of the entity component
+[ ] move character
+[ ] generate monsters
+[ ] bump attack
+[ ] potions
+[ ] web based ui
+[ ] win / lose

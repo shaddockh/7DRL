@@ -11,7 +11,34 @@ export default class CustomJSComponent extends Atomic.JSComponent {
             if (!this._componentName) {
                 this._componentName = Atomic.splitPath(this.componentFile.name).fileName;
             }
-            console.log(`${this.node.name}.${this._componentName}: ${msg}`);
+            if (typeof (msg) == "object") {
+                console.log(`${this.node.name}.${this._componentName}: ${JSON.stringify(msg, null, 2)}`);
+            } else {
+                console.log(`${this.node.name}.${this._componentName}: ${msg}`);
+
+            }
+        }
+    }
+
+    // Need to make this a part of the class so it doesn't get GC'd before the event fires
+    private deferredActionHandler: Atomic.ScriptObject = null;
+    deferAction(callback: () => void, eventName?: string) {
+        if (!this.deferredActionHandler) {
+            this.deferredActionHandler = new Atomic.ScriptObject();
+        }
+
+        if (eventName) {
+            this.deferredActionHandler.subscribeToEvent(Atomic.ScriptEvent(eventName, () => {
+                this.DEBUG("Called deferred event: " + eventName);
+                this.deferredActionHandler.unsubscribeFromEvent(eventName);
+                callback();
+            }));
+        } else {
+            this.deferredActionHandler.subscribeToEvent(Atomic.UpdateEvent(() => {
+                this.DEBUG("Called deferred event");
+                this.deferredActionHandler.unsubscribeFromEvent(Atomic.UpdateEventType);
+                callback();
+            }));
         }
     }
 }

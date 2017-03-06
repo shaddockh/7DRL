@@ -10,9 +10,25 @@ var LevelGenerator = (function () {
         this.debug = debug;
     }
     LevelGenerator.prototype.generateLevel = function () {
-        var _this = this;
         this.DEBUG("Generating level: " + this.width + "," + this.height);
         var level = new LevelMap_1.LevelMap(this.width, this.height);
+        this.generateTerrain(level);
+        this.generateEntities(level);
+        if (this.debug) {
+            console.log("Generated Level:");
+            var _loop_1 = function (y, yEnd) {
+                var line = [];
+                level.getCellsInRegion(y, 0, y, level.width - 1).forEach(function (cell) { return line.push(cell.terrainType == 1 /* wall */ ? "#" : "."); });
+                console.log(line.join(""));
+            };
+            for (var y = 0, yEnd = level.height - 1; y < yEnd; y++) {
+                _loop_1(y, yEnd);
+            }
+        }
+        return level;
+    };
+    LevelGenerator.prototype.generateTerrain = function (level) {
+        var _this = this;
         var builder = new ROT.Map.Rogue(this.width, this.height, this);
         builder.create(function (x, y, value) {
             if (level.inBounds(x, y)) {
@@ -33,18 +49,29 @@ var LevelGenerator = (function () {
                 _this.DEBUG("assigning to tile out of bounds: " + x + "," + y);
             }
         });
-        if (this.debug) {
-            console.log("Generated Level:");
-            var _loop_1 = function (y, yEnd) {
-                var line = [];
-                level.getCellsInRegion(y, 0, y, level.width - 1).forEach(function (cell) { return line.push(cell.terrainType == 1 /* wall */ ? "#" : "."); });
-                console.log(line.join(""));
-            };
-            for (var y = 0, yEnd = level.height - 1; y < yEnd; y++) {
-                _loop_1(y, yEnd);
-            }
+    };
+    LevelGenerator.prototype.generateEntities = function (level) {
+        // First generate the player
+        var emptyFloor = level.findEmptyFloorCell();
+        this.DEBUG("Placing player at " + emptyFloor.x + "," + emptyFloor.y);
+        level.addEntity({
+            gridPosition: [emptyFloor.x, emptyFloor.y],
+            blueprint: "entity_player",
+            blocksPath: true,
+            bumpable: true,
+            entityComponent: null
+        });
+        for (var i = 0; i < 3; i++) {
+            emptyFloor = level.findEmptyFloorCell();
+            this.DEBUG("Placing beetle at " + emptyFloor.x + "," + emptyFloor.y);
+            level.addEntity({
+                gridPosition: [emptyFloor.x, emptyFloor.y],
+                blueprint: "entity_beetle",
+                blocksPath: true,
+                bumpable: true,
+                entityComponent: null
+            });
         }
-        return level;
     };
     LevelGenerator.prototype.DEBUG = function (message) {
         if (this.debug) {

@@ -16,6 +16,8 @@ var CustomJSComponent = (function (_super) {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.debug = false;
         _this._componentName = null;
+        // Need to make this a part of the class so it doesn't get GC'd before the event fires
+        _this.deferredActionHandler = null;
         return _this;
     }
     /**
@@ -27,7 +29,32 @@ var CustomJSComponent = (function (_super) {
             if (!this._componentName) {
                 this._componentName = Atomic.splitPath(this.componentFile.name).fileName;
             }
-            console.log(this.node.name + "." + this._componentName + ": " + msg);
+            if (typeof (msg) == "object") {
+                console.log(this.node.name + "." + this._componentName + ": " + JSON.stringify(msg, null, 2));
+            }
+            else {
+                console.log(this.node.name + "." + this._componentName + ": " + msg);
+            }
+        }
+    };
+    CustomJSComponent.prototype.deferAction = function (callback, eventName) {
+        var _this = this;
+        if (!this.deferredActionHandler) {
+            this.deferredActionHandler = new Atomic.ScriptObject();
+        }
+        if (eventName) {
+            this.deferredActionHandler.subscribeToEvent(Atomic.ScriptEvent(eventName, function () {
+                _this.DEBUG("Called deferred event: " + eventName);
+                _this.deferredActionHandler.unsubscribeFromEvent(eventName);
+                callback();
+            }));
+        }
+        else {
+            this.deferredActionHandler.subscribeToEvent(Atomic.UpdateEvent(function () {
+                _this.DEBUG("Called deferred event");
+                _this.deferredActionHandler.unsubscribeFromEvent(Atomic.UpdateEventType);
+                callback();
+            }));
         }
     };
     return CustomJSComponent;

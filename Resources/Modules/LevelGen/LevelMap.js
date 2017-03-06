@@ -12,6 +12,7 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var ROT = require("Modules/thirdparty/rot");
 var Grid_1 = require("Modules/utils/Grid");
+var List_1 = require("Modules/utils/List");
 exports.EmptyMapCell = {
     visible: false,
     walkable: false,
@@ -34,24 +35,58 @@ var LevelMap = (function (_super) {
     function LevelMap(width, height) {
         var _this = _super.call(this, width, height) || this;
         _this.indexed = false;
+        _this.entities = new List_1.default();
         _this.fill(exports.EmptyMapCell);
         return _this;
     }
+    LevelMap.prototype.addEntity = function (entity) {
+        this.entities.add(entity);
+    };
+    LevelMap.prototype.inBounds = function (xOrPos, y) {
+        if (typeof (xOrPos) != "number") {
+            return _super.prototype.inBounds.call(this, xOrPos[0], xOrPos[1]);
+        }
+        else {
+            return _super.prototype.inBounds.call(this, xOrPos, y);
+        }
+    };
+    LevelMap.prototype.getCell = function (xOrPos, y) {
+        if (typeof (xOrPos) != "number") {
+            return _super.prototype.getCell.call(this, xOrPos[0], xOrPos[1]);
+        }
+        else {
+            return _super.prototype.getCell.call(this, xOrPos, y);
+        }
+    };
+    /**
+     * Iterate all the entities at a position.  Caller should return "true" in the callback to exit early
+     * @param pos
+     * @param callback
+     */
+    LevelMap.prototype.iterateEntitiesAt = function (pos, callback) {
+        this.entities.forEach(function (e) {
+            var ePos = e.gridPosition;
+            if (ePos[0] == pos[0] && ePos[1] == pos[1]) {
+                if (callback(e)) {
+                    return;
+                }
+            }
+        });
+    };
     /**
      * Build up an index of interesting things to be able to quickly retreive on the level such as walkable tiles, etc.
      */
     LevelMap.prototype.buildIndex = function () {
-        if (this.indexed) {
-            return;
+        if (!this.indexed) {
+            var walkables_1 = [];
+            this.iterate(function (x, y, cell) {
+                if (cell.walkable) {
+                    walkables_1.push(new IndexedMapCell(cell, x, y));
+                }
+            });
+            this.walkables = walkables_1;
+            this.indexed = true;
         }
-        var walkables = [];
-        this.iterate(function (x, y, cell) {
-            if (cell.walkable) {
-                walkables.push(new IndexedMapCell(cell, x, y));
-            }
-        });
-        this.walkables = walkables;
-        this.indexed = true;
     };
     /**
      * Look through an find an empty walkable tile
@@ -63,6 +98,39 @@ var LevelMap = (function (_super) {
         while (true) {
             var cell = this.walkables[ROT.RNG.getUniformInt(0, this.walkables.length)];
             if (cell) {
+                return cell;
+            }
+            iterations++;
+            if (iterations > 1000) {
+                throw new Error("Could not find an empty floor cell after 1000 iterations");
+            }
+        }
+    };
+    /**
+     * Look through an find an empty walkable tile in the current area
+     */
+    LevelMap.prototype.findEmptyFloorCellInRadius = function (origin, radius) {
+        this.buildIndex();
+        // first scan for an empty floor
+        var iterations = 0;
+        var nearbyWalkables = this.walkables.filter(function (c) {
+            if (c.x == origin[0] && c.y == origin[1]) {
+                return false;
+            }
+            return Math.abs(c.x - origin[0]) <= radius && Math.abs(c.y - origin[1]) <= radius;
+        });
+        while (true) {
+            var cell = nearbyWalkables[ROT.RNG.getUniformInt(0, nearbyWalkables.length)];
+            if (cell) {
+                // force cardinal directions
+                if (cell.x != 0 && cell.y != 0) {
+                    if (ROT.RNG.getUniformInt(0, 1) == 0) {
+                        //cell.x = 0;
+                    }
+                    else {
+                        //cell.y = 0;
+                    }
+                }
                 return cell;
             }
             iterations++;

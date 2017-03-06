@@ -38,4 +38,8 @@ __Ideas__
 - Generating a simple roguelike style dungeon with ROT.js
 - Rendering said dungeon with the game prototyping tiles from Lost Garden
 
-
+### Day 2 - March 5, 2017
+- basic movement of player
+- lots of work hooking into the event system
+- rendering monsters
+- very simplistic AI of monsters walking in a random way

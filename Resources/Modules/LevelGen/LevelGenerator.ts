@@ -1,5 +1,6 @@
 import * as ROT from "Modules/thirdparty/rot";
 import { LevelMap } from "./LevelMap";
+import { TerrainType } from "Game";
 
 export default class LevelGenerator {
 
@@ -9,6 +10,22 @@ export default class LevelGenerator {
     generateLevel(): LevelMap {
         this.DEBUG(`Generating level: ${this.width},${this.height}`);
         const level = new LevelMap(this.width, this.height);
+        this.generateTerrain(level);
+        this.generateEntities(level);
+
+        if (this.debug) {
+            console.log("Generated Level:");
+            for (let y = 0, yEnd = level.height - 1; y < yEnd; y++) {
+                let line = [];
+                level.getCellsInRegion(y, 0, y, level.width - 1).forEach(cell => line.push(cell.terrainType == TerrainType.wall ? "#" : "."));
+                console.log(line.join(""));
+            }
+        }
+
+        return level;
+    }
+
+    private generateTerrain(level: LevelMap) {
         const builder = new ROT.Map.Rogue(this.width, this.height, this);
 
         builder.create((x, y, value) => {
@@ -16,11 +33,11 @@ export default class LevelGenerator {
                 const cell = level.getCell(x, y);
                 if (value) {
                     cell.floorGlyph = 0;
-                    cell.terrainType = Game.TerrainType.wall;
+                    cell.terrainType = TerrainType.wall;
                     cell.blueprint = "tile_wall";
                 } else {
                     cell.floorGlyph = 1;
-                    cell.terrainType = Game.TerrainType.floor;
+                    cell.terrainType = TerrainType.floor;
                     cell.walkable = true;
                     cell.blueprint = "tile_floor";
                 }
@@ -28,17 +45,31 @@ export default class LevelGenerator {
                 this.DEBUG(`assigning to tile out of bounds: ${x},${y}`);
             }
         });
+    }
 
-        if (this.debug) {
-            console.log("Generated Level:");
-            for (let y = 0, yEnd = level.height - 1; y < yEnd; y++) {
-                let line = [];
-                level.getCellsInRegion(y, 0, y, level.width - 1).forEach(cell => line.push(cell.terrainType == Game.TerrainType.wall ? "#" : "."));
-                console.log(line.join(""));
-            }
+    private generateEntities(level: LevelMap) {
+        // First generate the player
+        let emptyFloor = level.findEmptyFloorCell();
+        this.DEBUG(`Placing player at ${emptyFloor.x},${emptyFloor.y}`);
+        level.addEntity({
+            gridPosition: [emptyFloor.x, emptyFloor.y],
+            blueprint: "entity_player",
+            blocksPath: true,
+            bumpable: true,
+            entityComponent: null
+        });
+
+        for (let i = 0; i < 3; i++) {
+            emptyFloor = level.findEmptyFloorCell();
+            this.DEBUG(`Placing beetle at ${emptyFloor.x},${emptyFloor.y}`);
+            level.addEntity({
+                gridPosition: [emptyFloor.x, emptyFloor.y],
+                blueprint: "entity_beetle",
+                blocksPath: true,
+                bumpable: true,
+                entityComponent: null
+            });
         }
-
-        return level;
     }
 
     DEBUG(message: string) {
