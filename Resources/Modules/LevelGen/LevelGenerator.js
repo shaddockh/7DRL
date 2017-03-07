@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var ROT = require("Modules/thirdparty/rot");
+var ROT = require("rot");
 var LevelMap_1 = require("./LevelMap");
 var LevelGenerator = (function () {
     function LevelGenerator(width, height, debug) {
@@ -59,7 +59,8 @@ var LevelGenerator = (function () {
             blueprint: "entity_player",
             blocksPath: true,
             bumpable: true,
-            entityComponent: null
+            entityComponent: null,
+            attackable: false
         });
         for (var i = 0; i < 3; i++) {
             emptyFloor = level.findEmptyFloorCell();
@@ -69,7 +70,8 @@ var LevelGenerator = (function () {
                 blueprint: "entity_beetle",
                 blocksPath: true,
                 bumpable: true,
-                entityComponent: null
+                entityComponent: null,
+                attackable: false
             });
         }
     };

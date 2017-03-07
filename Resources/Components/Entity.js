@@ -19,12 +19,14 @@ var Entity = (function (_super) {
         _this.inspectorFields = {
             debug: true,
             blocksPath: false,
-            bumpable: false
+            bumpable: false,
+            attackable: false
         };
         return _this;
     }
     Object.defineProperty(Entity.prototype, "gridPosition", {
         get: function () {
+            // TODO: the position provider should send an event announcing itself
             return this.node.getJSComponent("GridMover").gridPosition;
         },
         enumerable: true,

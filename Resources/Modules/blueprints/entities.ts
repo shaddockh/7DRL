@@ -1,3 +1,4 @@
+import { BasicMonsterAiProps } from "../../Components/ai/BasicMonsterAi";
 
 export const entity_base = {
     prefabDir: "Prefabs/autogen/entities",
@@ -26,6 +27,7 @@ export const entity_player = {
     },
     Entity: {
         bumpable: true,
+        attackable: true,
         blocksPath: true
     },
     PlayerAi: {}
@@ -38,7 +40,10 @@ export const entity_beetle = {
     },
     Entity: {
         bumpable: true,
+        attackable: true,
         blocksPath: true
     },
-    BasicMonsterAi: {}
+    BasicMonsterAi: {
+        wanderChance: 23
+    } as BasicMonsterAiProps
 };

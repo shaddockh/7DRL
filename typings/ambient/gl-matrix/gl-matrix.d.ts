@@ -2,7 +2,7 @@
 // Project: https://github.com/toji/gl-matrix
 // Definitions by: Tat <https://github.com/tatchx>
 // Definitions: https://github.com/borisyankov/DefinitelyTyped
-declare module "Modules/thirdpaty/gl-matrix" {
+declare module "gl-matrix" {
     module GLM {
         interface IArray {
             /**

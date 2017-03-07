@@ -10,7 +10,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var ROT = require("Modules/thirdparty/rot");
+var ROT = require("rot");
 var Grid_1 = require("Modules/utils/Grid");
 var List_1 = require("Modules/utils/List");
 exports.EmptyMapCell = {
@@ -125,10 +125,10 @@ var LevelMap = (function (_super) {
                 // force cardinal directions
                 if (cell.x != 0 && cell.y != 0) {
                     if (ROT.RNG.getUniformInt(0, 1) == 0) {
-                        //cell.x = 0;
+                        // cell.x = 0;
                     }
                     else {
-                        //cell.y = 0;
+                        // cell.y = 0;
                     }
                 }
                 return cell;

@@ -1,15 +1,22 @@
 import CustomJSComponent from "Modules/CustomJSComponent";
 import { LevelMap } from "Modules/LevelGen/LevelMap";
-import * as ROT from "Modules/thirdparty/rot";
+import * as ROT from "rot";
 import {
     RegisterActorAiEventData,
     MoveEntityCompleteEvent,
     TurnTakenEventData,
     TurnTakenEvent,
-    PlayerActionCompleteEventData,
-    PlayerActionCompleteEvent,
-    PlayerActionBeginEventData
+    ActionCompleteEventData,
+    ActionCompleteEvent,
+    PlayerActionBeginEventData,
+    ActionCompleteEventType,
+    ComponentNotificationEvent,
+    AttackEntityEventData,
+    DamageEntityEventData,
+    BumpEntityEvent,
+    AttackEntityEvent
 } from "Modules/CustomEvents";
+import Entity from "Components/Entity";
 "atomic component";
 
 export default class PlayerAi extends CustomJSComponent {
@@ -26,6 +33,12 @@ export default class PlayerAi extends CustomJSComponent {
         this.subscribeToEvent(this.node, TurnTakenEvent(this.onTurnTaken.bind(this)));
         // this.subscribeToEvent(this.node, PlayerActionCompleteEvent(this.onActionComplete.bind(this)));
 
+        // called when we bump into something
+        this.subscribeToEvent(this.node, BumpEntityEvent(this.onHandleBump.bind(this)));
+
+        // called when we want to attack something
+        this.subscribeToEvent(this.node, AttackEntityEvent(this.onHandleAttackEntity.bind(this)));
+
         this.sendEvent(RegisterActorAiEventData({ ai: this }));
     }
 
@@ -40,7 +53,7 @@ export default class PlayerAi extends CustomJSComponent {
         // See: http://ondras.github.io/rot.js/manual/#timing/engine for some more information.
         return {
             then: (resolve) => {
-                this.deferAction(resolve, "PlayerActionComplete");
+                this.deferAction(resolve, ActionCompleteEventType);
             }
         };
     }
@@ -60,7 +73,7 @@ export default class PlayerAi extends CustomJSComponent {
         });
         */
 
-        this.node.sendEvent(PlayerActionCompleteEventData());
+        this.node.sendEvent(ActionCompleteEventData());
     }
 
     onActionComplete() {
@@ -76,6 +89,36 @@ export default class PlayerAi extends CustomJSComponent {
         }
         */
     }
+
+    /**
+     * Called when we bump into something.
+     * @param data
+     */
+    onHandleBump(data: ComponentNotificationEvent) {
+        this.DEBUG("Bumped Entity: " + data.targetComponent.node.name);
+        // who did we bump into?
+        const entityComponent = data.targetComponent.node.getJSComponent<Entity>("Entity");
+        if (entityComponent.attackable) {
+            // here we need to recreate the event object because it will get GCd
+            this.node.sendEvent(AttackEntityEventData({
+                targetComponent: data.targetComponent
+            }));
+        }
+    }
+
+    /**
+     * Called when we need to attack something
+     * @param data 
+     */
+    onHandleAttackEntity(data: ComponentNotificationEvent) {
+        this.DEBUG("Attack Entity");
+        this.DEBUG(data.targetComponent.typeName);
+        // figure out damage and send it over
+        data.targetComponent.node.sendEvent(DamageEntityEventData({
+            attackerComponent: this
+        }));
+    }
+
 
 
 }

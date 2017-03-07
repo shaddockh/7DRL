@@ -28,6 +28,7 @@ export default class CustomJSComponent extends Atomic.JSComponent {
         }
 
         if (eventName) {
+            this.DEBUG("Listening for deferred action:" + eventName);
             this.deferredActionHandler.subscribeToEvent(Atomic.ScriptEvent(eventName, () => {
                 this.DEBUG("Called deferred event: " + eventName);
                 this.deferredActionHandler.unsubscribeFromEvent(eventName);

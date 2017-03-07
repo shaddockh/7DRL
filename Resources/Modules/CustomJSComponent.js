@@ -43,6 +43,7 @@ var CustomJSComponent = (function (_super) {
             this.deferredActionHandler = new Atomic.ScriptObject();
         }
         if (eventName) {
+            this.DEBUG("Listening for deferred action:" + eventName);
             this.deferredActionHandler.subscribeToEvent(Atomic.ScriptEvent(eventName, function () {
                 _this.DEBUG("Called deferred event: " + eventName);
                 _this.deferredActionHandler.unsubscribeFromEvent(eventName);

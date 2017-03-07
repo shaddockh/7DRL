@@ -40,7 +40,7 @@ var EntityOrderRenderer = (function (_super) {
         configurable: true
     });
     EntityOrderRenderer.prototype.start = function () {
-        this.subscribeToEvent(CustomEvents_1.MoveEntityCompleteEvent(this.onMoveEntityComplete.bind(this)));
+        this.subscribeToEvent(this.node, CustomEvents_1.MoveEntityCompleteEvent(this.onMoveEntityComplete.bind(this)));
     };
     EntityOrderRenderer.prototype.onMoveEntityComplete = function () {
         var currentLevel = this.node.scene.getJSComponent("LevelController").currentLevel;

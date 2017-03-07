@@ -1,97 +1,47 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-/**
- * Constructs a custom script event that can be used for subscribing to
- * @param eventType
- */
-function buildEvent(eventType) {
-    return function (callback) {
-        return Atomic.ScriptEvent(eventType, callback);
-    };
-}
-/**
- * Constructs a custom script event that can be used for subscribing to
- * @param eventType
- */
-function buildNotifyEvent(eventType) {
-    return function (callback) {
-        return Atomic.ScriptEvent(eventType, callback);
-    };
-}
-/**
- * Constructs a custom script data event that can used to send
- * @param eventType
- */
-function buildEventData(eventType) {
-    return function (callbackData) {
-        return Atomic.ScriptEventData(eventType, callbackData);
-    };
-}
-/**
- * Constructs a custom script data event that can used to send. Will stringify the data to JSON before sending it and
- * is required for more complex objects that contain arrays.  Any object pointers, however, will get lost.
- * @param eventType
- */
-function buildEventDataJson(eventType) {
-    return function (callbackData) {
-        return Atomic.ScriptEventData(eventType, { json: JSON.stringify(callbackData) });
-    };
-}
-/**
- * Constructs a custom script event that can be used for subscribing to.  Will convert result from JSON to an object which
- * is required for more complex objects that contain arrays.  Any object pointers, however, will get lost.
- * @param eventType
- */
-function buildEventJson(eventType) {
-    return function (callback) {
-        return Atomic.ScriptEvent(eventType, function (wrapper) { return callback(JSON.parse(wrapper.json)); });
-    };
-}
-/**
- * Constructs a custom script data event that can used to send
- * @param eventType
- */
-function buildNotifyEventData(eventType) {
-    return function () {
-        return Atomic.ScriptEventData(eventType);
-    };
-}
-exports.LoadLevelEvent = buildEvent("LoadLevel");
-exports.LoadLevelEventData = buildEventData("LoadLevel");
-exports.RenderCurrentLevelEvent = buildNotifyEvent("RenderCurrentLevel");
-exports.RenderCurrentLevelEventData = buildNotifyEventData("RenderCurrentLevel");
+var CustomEventFactory = require("./CustomEventFactory");
+exports.LoadLevelEvent = CustomEventFactory.buildEvent("LoadLevel");
+exports.LoadLevelEventData = CustomEventFactory.buildEventData("LoadLevel");
+exports.RenderCurrentLevelEvent = CustomEventFactory.buildNotifyEvent("RenderCurrentLevel");
+exports.RenderCurrentLevelEventData = CustomEventFactory.buildNotifyEventData("RenderCurrentLevel");
 /**
  * Custom event that is sent when the primary controller for a scene has completed loading
  * @param callback
  */
-exports.SceneReadyEvent = buildNotifyEvent("SceneReady");
-exports.SceneReadyEventData = buildNotifyEventData("SceneReady");
-exports.MoveEntityEvent = buildEvent("MoveEntity");
-exports.MoveEntityEventData = buildEventData("MoveEntity");
-exports.MoveEntityByOffsetEvent = buildEventJson("MoveEntityByOffset");
-exports.MoveEntityByOffsetEventData = buildEventDataJson("MoveEntityByOffset");
-exports.MoveEntityStartEvent = buildEvent("MoveEntityStart");
-exports.MoveEntityStartEventData = buildEventData("MoveEntityStart");
-exports.MoveEntityCompleteEvent = buildNotifyEvent("MoveEntityComplete");
-exports.MoveEntityCompleteEventData = buildNotifyEventData("MoveEntityComplete");
-exports.MoveEntityBlockedEvent = buildEvent("MoveEntityBlocked");
-exports.MoveEntityBlockedEventData = buildEventData("MoveEntityBlocked");
-exports.LogMessageEvent = buildEvent("LogMessage");
-exports.LogMessageEventData = buildEventData("LogMessage");
-exports.BumpEntityEvent = buildEvent("BumpEntity");
-exports.BumpEntityEventData = buildEventData("bumpEntity");
-exports.SkipTurnEvent = buildNotifyEvent("SkipTurn");
-exports.SkipTurnEventData = buildNotifyEventData("SkipTurn");
-exports.RegisterLevelActorsEvent = buildEvent("RegisterLevelActors");
-exports.RegisterLevelActorsEventData = buildEventData("RegisterLevelActors");
-exports.RegisterActorAiEvent = buildEvent("RegisterActorAi");
-exports.RegisterActorAiEventData = buildEventData("RegisterActorAi");
-exports.DeregisterActorAiEvent = buildEvent("UnregisterActorAi");
-exports.DeregisterActorAiEventData = buildEventData("UnregisterActorAi");
-exports.PlayerActionBeginEvent = buildNotifyEvent("PlayerActionBegin");
-exports.PlayerActionBeginEventData = buildNotifyEventData("PlayerActionBegin");
-exports.PlayerActionCompleteEvent = buildNotifyEvent("PlayerActionComplete");
-exports.PlayerActionCompleteEventData = buildNotifyEventData("PlayerActionComplete");
-exports.TurnTakenEvent = buildNotifyEvent("TurnTaken");
-exports.TurnTakenEventData = buildNotifyEventData("TurnTaken");
+exports.SceneReadyEvent = CustomEventFactory.buildNotifyEvent("SceneReady");
+exports.SceneReadyEventData = CustomEventFactory.buildNotifyEventData("SceneReady");
+exports.MoveEntityEvent = CustomEventFactory.buildEvent("MoveEntity");
+exports.MoveEntityEventData = CustomEventFactory.buildEventData("MoveEntity");
+exports.MoveEntityByOffsetEvent = CustomEventFactory.buildEventJson("MoveEntityByOffset");
+exports.MoveEntityByOffsetEventData = CustomEventFactory.buildEventDataJson("MoveEntityByOffset");
+exports.MoveEntityStartEvent = CustomEventFactory.buildEvent("MoveEntityStart");
+exports.MoveEntityStartEventData = CustomEventFactory.buildEventData("MoveEntityStart");
+exports.MoveEntityCompleteEvent = CustomEventFactory.buildNotifyEvent("MoveEntityComplete");
+exports.MoveEntityCompleteEventData = CustomEventFactory.buildNotifyEventData("MoveEntityComplete");
+exports.MoveEntityBlockedEvent = CustomEventFactory.buildEvent("MoveEntityBlocked");
+exports.MoveEntityBlockedEventData = CustomEventFactory.buildEventData("MoveEntityBlocked");
+exports.LogMessageEvent = CustomEventFactory.buildEvent("LogMessage");
+exports.LogMessageEventData = CustomEventFactory.buildEventData("LogMessage");
+exports.BumpEntityEvent = CustomEventFactory.buildEvent("BumpEntity");
+exports.BumpEntityEventData = CustomEventFactory.buildEventData("bumpEntity");
+exports.AttackEntityEvent = CustomEventFactory.buildEvent("AttackEntity");
+exports.AttackEntityEventData = CustomEventFactory.buildEventData("AttackEntity");
+exports.DamageEntityEvent = CustomEventFactory.buildEvent("DamageEntity");
+exports.DamageEntityEventData = CustomEventFactory.buildEventData("DamageEntity");
+exports.SkipTurnEvent = CustomEventFactory.buildNotifyEvent("SkipTurn");
+exports.SkipTurnEventData = CustomEventFactory.buildNotifyEventData("SkipTurn");
+exports.RegisterLevelActorsEvent = CustomEventFactory.buildEvent("RegisterLevelActors");
+exports.RegisterLevelActorsEventData = CustomEventFactory.buildEventData("RegisterLevelActors");
+exports.RegisterActorAiEvent = CustomEventFactory.buildEvent("RegisterActorAi");
+exports.RegisterActorAiEventData = CustomEventFactory.buildEventData("RegisterActorAi");
+exports.DeregisterActorAiEvent = CustomEventFactory.buildEvent("UnregisterActorAi");
+exports.DeregisterActorAiEventData = CustomEventFactory.buildEventData("UnregisterActorAi");
+exports.PlayerActionBeginEvent = CustomEventFactory.buildNotifyEvent("PlayerActionBegin");
+exports.PlayerActionBeginEventData = CustomEventFactory.buildNotifyEventData("PlayerActionBegin");
+exports.ActionCompleteEventType = "ActionComplete";
+exports.ActionCompleteEvent = CustomEventFactory.buildNotifyEvent(exports.ActionCompleteEventType);
+exports.ActionCompleteEventData = CustomEventFactory.buildNotifyEventData(exports.ActionCompleteEventType);
+exports.TurnTakenEvent = CustomEventFactory.buildNotifyEvent("TurnTaken");
+exports.TurnTakenEventData = CustomEventFactory.buildNotifyEventData("TurnTaken");
 //# sourceMappingURL=CustomEvents.js.map

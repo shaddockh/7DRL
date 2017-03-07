@@ -1,5 +1,5 @@
 
-import * as ROT from "Modules/thirdparty/rot";
+import * as ROT from "rot";
 import { Grid } from "Modules/utils/Grid";
 import { TerrainType, MapCell, Position2d, EntityData } from "Game";
 import List from "Modules/utils/List";
@@ -141,9 +141,9 @@ export class LevelMap extends Grid<MapCell> {
                 // force cardinal directions
                 if (cell.x != 0 && cell.y != 0) {
                     if (ROT.RNG.getUniformInt(0, 1) == 0) {
-                        //cell.x = 0;
+                        // cell.x = 0;
                     } else {
-                        //cell.y = 0;
+                        // cell.y = 0;
                     }
                 }
                 return cell;

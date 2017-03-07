@@ -25,6 +25,7 @@ exports.entity_player = {
     },
     Entity: {
         bumpable: true,
+        attackable: true,
         blocksPath: true
     },
     PlayerAi: {}
@@ -36,8 +37,11 @@ exports.entity_beetle = {
     },
     Entity: {
         bumpable: true,
+        attackable: true,
         blocksPath: true
     },
-    BasicMonsterAi: {}
+    BasicMonsterAi: {
+        wanderChance: 23
+    }
 };
 //# sourceMappingURL=entities.js.map

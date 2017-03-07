@@ -24,7 +24,7 @@ export default class EntityOrderRenderer extends CustomJSComponent {
     }
 
     start() {
-        this.subscribeToEvent(MoveEntityCompleteEvent(this.onMoveEntityComplete.bind(this)));
+        this.subscribeToEvent(this.node, MoveEntityCompleteEvent(this.onMoveEntityComplete.bind(this)));
     }
 
     onMoveEntityComplete() {

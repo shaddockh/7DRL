@@ -11,7 +11,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var CustomJSComponent_1 = require("Modules/CustomJSComponent");
-var ROT = require("Modules/thirdparty/rot");
+var ROT = require("rot");
 var CustomEvents_1 = require("Modules/CustomEvents");
 "atomic component";
 var LevelController = (function (_super) {

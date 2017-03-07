@@ -1,6 +1,6 @@
 import CustomJSComponent from "Modules/CustomJSComponent";
 import { LevelMap } from "Modules/LevelGen/LevelMap";
-import * as ROT from "Modules/thirdparty/rot";
+import * as ROT from "rot";
 import {
     LoadLevelEvent,
     RegisterActorAiEvent,

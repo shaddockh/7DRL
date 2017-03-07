@@ -14,6 +14,7 @@
 		<attribute name="ComponentFile" value="JSComponentFile;Components/Entity.js" />
 		<attribute name="FieldValues">
 			<variant name="bumpable" type="Bool" value="true" />
+			<variant name="attackable" type="Bool" value="true" />
 			<variant name="blocksPath" type="Bool" value="true" />
 		</attribute>
 	</component>
@@ -30,5 +31,8 @@
 	</component>
 	<component type="JSComponent" id="16777228">
 		<attribute name="ComponentFile" value="JSComponentFile;Components/ai/BasicMonsterAi.js" />
+		<attribute name="FieldValues">
+			<variant name="wanderChance" type="Float" value="23" />
+		</attribute>
 	</component>
 </node>

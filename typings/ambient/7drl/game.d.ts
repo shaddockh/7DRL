@@ -26,6 +26,7 @@ declare module "Game" {
         blueprint: any,
         blocksPath: boolean;
         bumpable: boolean;
+        attackable: boolean;
         // TODO: Not sure I like this here
         entityComponent: Atomic.JSComponent;
     }

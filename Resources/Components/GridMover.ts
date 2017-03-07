@@ -4,7 +4,7 @@ import Entity from "./Entity";
 // import gameState from '../../Modules/gameState';
 // import GameController from "GameController";
 import * as CustomEvents from "Modules/CustomEvents";
-import { vec2 } from "Modules/thirdparty/gl-matrix";
+import { vec2 } from "gl-matrix";
 // import { ComponentEvents } from "Constants";
 import { Position2d, TerrainType } from "Game";
 import LevelRenderer from "Components/LevelRenderer";
@@ -83,7 +83,7 @@ export default class GridMover extends CustomJSComponent {
 
             // see if we can move into the next space
             let mapPos = this.gridPosition;
-            let newMapPos = vec2.add(vec2.create(), mapPos, data.position);
+            let newMapPos = vec2.add(vec2.create(), mapPos, data.position) as Position2d;
             this.DEBUG(`Moving from: ${mapPos[0]},${mapPos[1]} to: ${newMapPos[0]},${newMapPos[1]}`);
 
             this.moving = true;
@@ -105,15 +105,15 @@ export default class GridMover extends CustomJSComponent {
             } else {
                 currentLevel.iterateEntitiesAt(newMapPos, (entity) => {
                     // We are going to bump the top level entity if it's bumpable
-                    //if (entity.entityComponent) {
+                    // if (entity.entityComponent) {
                     if (entity.blocksPath) {
                         this.blocked = true;
                         this.moving = false;
-                        //this.queuePostMoveAction(() => {
+                        // this.queuePostMoveAction(() => {
                         this.DEBUG("Blocked by Entity");
                         this.node.sendEvent(CustomEvents.MoveEntityBlockedEventData({ from: mapPos, to: newMapPos }));
                         this.node.sendEvent(CustomEvents.MoveEntityCompleteEventData());
-                        //});
+                        // });
                     }
                     if (entity.bumpable) {
                         // Let's exit the loop since we only want to deal with the first entity
@@ -122,7 +122,7 @@ export default class GridMover extends CustomJSComponent {
                     } else {
                         return true;
                     }
-                    //}
+                    // }
                 });
             }
 

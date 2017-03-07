@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 // plugin for generating prefabs from blueprints
-require("Modules/thirdparty/atomic-blueprintlib.bundle");
+require("Modules/atomic-blueprintlib.bundle");
 var blueprintLib = require("atomic-blueprintlib");
 var ExamplePluginUILabel = "Atomic BlueprintLib";
 var debug = false;

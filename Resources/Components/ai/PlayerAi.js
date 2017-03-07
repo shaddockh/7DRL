@@ -30,6 +30,10 @@ var PlayerAi = (function (_super) {
         this.subscribeToEvent(this.node, CustomEvents_1.MoveEntityCompleteEvent(this.onMoveComplete.bind(this)));
         this.subscribeToEvent(this.node, CustomEvents_1.TurnTakenEvent(this.onTurnTaken.bind(this)));
         // this.subscribeToEvent(this.node, PlayerActionCompleteEvent(this.onActionComplete.bind(this)));
+        // called when we bump into something
+        this.subscribeToEvent(this.node, CustomEvents_1.BumpEntityEvent(this.onHandleBump.bind(this)));
+        // called when we want to attack something
+        this.subscribeToEvent(this.node, CustomEvents_1.AttackEntityEvent(this.onHandleAttackEntity.bind(this)));
         this.sendEvent(CustomEvents_1.RegisterActorAiEventData({ ai: this }));
     };
     PlayerAi.prototype.act = function () {
@@ -43,7 +47,7 @@ var PlayerAi = (function (_super) {
         // See: http://ondras.github.io/rot.js/manual/#timing/engine for some more information.
         return {
             then: function (resolve) {
-                _this.deferAction(resolve, "PlayerActionComplete");
+                _this.deferAction(resolve, CustomEvents_1.ActionCompleteEventType);
             }
         };
     };
@@ -60,7 +64,7 @@ var PlayerAi = (function (_super) {
             this.levelController.updateFov(this.getPosition());
         });
         */
-        this.node.sendEvent(CustomEvents_1.PlayerActionCompleteEventData());
+        this.node.sendEvent(CustomEvents_1.ActionCompleteEventData());
     };
     PlayerAi.prototype.onActionComplete = function () {
         this.DEBUG("OnActionComplete");
@@ -74,6 +78,33 @@ var PlayerAi = (function (_super) {
             });
         }
         */
+    };
+    /**
+     * Called when we bump into something.
+     * @param data
+     */
+    PlayerAi.prototype.onHandleBump = function (data) {
+        this.DEBUG("Bumped Entity: " + data.targetComponent.node.name);
+        // who did we bump into?
+        var entityComponent = data.targetComponent.node.getJSComponent("Entity");
+        if (entityComponent.attackable) {
+            // here we need to recreate the event object because it will get GCd
+            this.node.sendEvent(CustomEvents_1.AttackEntityEventData({
+                targetComponent: data.targetComponent
+            }));
+        }
+    };
+    /**
+     * Called when we need to attack something
+     * @param data
+     */
+    PlayerAi.prototype.onHandleAttackEntity = function (data) {
+        this.DEBUG("Attack Entity");
+        this.DEBUG(data.targetComponent.typeName);
+        // figure out damage and send it over
+        data.targetComponent.node.sendEvent(CustomEvents_1.DamageEntityEventData({
+            attackerComponent: this
+        }));
     };
     return PlayerAi;
 }(CustomJSComponent_1.default));

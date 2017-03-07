@@ -1,4 +1,4 @@
-import * as ROT from "Modules/thirdparty/rot";
+import * as ROT from "rot";
 import { LevelMap } from "./LevelMap";
 import { TerrainType } from "Game";
 
@@ -56,7 +56,8 @@ export default class LevelGenerator {
             blueprint: "entity_player",
             blocksPath: true,
             bumpable: true,
-            entityComponent: null
+            entityComponent: null,
+            attackable: false
         });
 
         for (let i = 0; i < 3; i++) {
@@ -67,7 +68,8 @@ export default class LevelGenerator {
                 blueprint: "entity_beetle",
                 blocksPath: true,
                 bumpable: true,
-                entityComponent: null
+                entityComponent: null,
+                attackable: false
             });
         }
     }

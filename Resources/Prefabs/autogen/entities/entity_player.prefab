@@ -14,6 +14,7 @@
 		<attribute name="ComponentFile" value="JSComponentFile;Components/Entity.js" />
 		<attribute name="FieldValues">
 			<variant name="bumpable" type="Bool" value="true" />
+			<variant name="attackable" type="Bool" value="true" />
 			<variant name="blocksPath" type="Bool" value="true" />
 		</attribute>
 	</component>

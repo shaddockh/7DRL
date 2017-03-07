@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 require("AtomicEventLoop");
-require("Modules/thirdparty/atomic-blueprintlib.bundle");
+require("atomic-blueprintlib.bundle");
 var atomic_blueprintlib_1 = require("atomic-blueprintlib");
 var blueprints = require("Modules/blueprints");
 var CustomEvents = require("Modules/CustomEvents");

@@ -15,7 +15,7 @@ var CustomJSComponent_1 = require("Modules/CustomJSComponent");
 // import gameState from '../../Modules/gameState';
 // import GameController from "GameController";
 var CustomEvents = require("Modules/CustomEvents");
-var gl_matrix_1 = require("Modules/thirdparty/gl-matrix");
+var gl_matrix_1 = require("gl-matrix");
 var GridMover = (function (_super) {
     __extends(GridMover, _super);
     function GridMover() {
@@ -98,15 +98,15 @@ var GridMover = (function (_super) {
             else {
                 currentLevel.iterateEntitiesAt(newMapPos_1, function (entity) {
                     // We are going to bump the top level entity if it's bumpable
-                    //if (entity.entityComponent) {
+                    // if (entity.entityComponent) {
                     if (entity.blocksPath) {
                         _this.blocked = true;
                         _this.moving = false;
-                        //this.queuePostMoveAction(() => {
+                        // this.queuePostMoveAction(() => {
                         _this.DEBUG("Blocked by Entity");
                         _this.node.sendEvent(CustomEvents.MoveEntityBlockedEventData({ from: mapPos_1, to: newMapPos_1 }));
                         _this.node.sendEvent(CustomEvents.MoveEntityCompleteEventData());
-                        //});
+                        // });
                     }
                     if (entity.bumpable) {
                         // Let's exit the loop since we only want to deal with the first entity
@@ -116,7 +116,7 @@ var GridMover = (function (_super) {
                     else {
                         return true;
                     }
-                    //}
+                    // }
                 });
             }
             if (this.moving) {

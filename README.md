@@ -43,3 +43,12 @@ __Ideas__
 - lots of work hooking into the event system
 - rendering monsters
 - very simplistic AI of monsters walking in a random way
+
+### Day 3 - March 6, 2017
+- start implementing bump/attack system
+- code cleanup
+- started thinking of ways to loosely couple attack/defend through events.  maybe by sending an attacker interface to a defender
+  so the defender doesn't have to know the specific type of attack component.
+- looked into using html for the ui with an embedded web view, but those don't look like they get deployed when you build, so that idea is out.  So basically, back to using TB for the ui.
+- discovered that you need to periodically re-import assets after generating the prefabs since the cache gets out of sync.  This might be something the blueprint plugin should automatically do on generation.
+- start adding configuration to the monster ai

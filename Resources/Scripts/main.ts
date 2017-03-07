@@ -1,5 +1,5 @@
 import "AtomicEventLoop";
-import "Modules/thirdparty/atomic-blueprintlib.bundle";
+import "atomic-blueprintlib.bundle";
 import { catalog } from "atomic-blueprintlib";
 import * as blueprints from "Modules/blueprints";
 import * as CustomEvents from "Modules/CustomEvents";

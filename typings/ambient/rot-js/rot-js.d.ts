@@ -1,4 +1,4 @@
-declare module "Modules/thirdparty/rot" {
+declare module "rot" {
 
     module ROT {
 
