@@ -32,4 +32,11 @@
 	<component type="JSComponent" id="16777224">
 		<attribute name="ComponentFile" value="JSComponentFile;Components/ai/PlayerAi.js" />
 	</component>
+	<component type="JSComponent" id="16777225">
+		<attribute name="ComponentFile" value="JSComponentFile;Components/Health.js" />
+		<attribute name="FieldValues">
+			<variant name="debug" type="Bool" value="true" />
+			<variant name="life" type="Float" value="5" />
+		</attribute>
+	</component>
 </node>

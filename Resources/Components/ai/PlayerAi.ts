@@ -14,7 +14,10 @@ import {
     AttackEntityEventData,
     DamageEntityEventData,
     BumpEntityEvent,
-    AttackEntityEvent
+    AttackEntityEvent,
+    HitEventData,
+    DamageEntityEvent,
+    HitEvent
 } from "Modules/CustomEvents";
 import Entity from "Components/Entity";
 "atomic component";
@@ -38,6 +41,9 @@ export default class PlayerAi extends CustomJSComponent {
 
         // called when we want to attack something
         this.subscribeToEvent(this.node, AttackEntityEvent(this.onHandleAttackEntity.bind(this)));
+
+        // called when we have been hit by something
+        this.subscribeToEvent(this.node, HitEvent(this.onHit.bind(this)));
 
         this.sendEvent(RegisterActorAiEventData({ ai: this }));
     }
@@ -114,11 +120,23 @@ export default class PlayerAi extends CustomJSComponent {
         this.DEBUG("Attack Entity");
         this.DEBUG(data.targetComponent.typeName);
         // figure out damage and send it over
-        data.targetComponent.node.sendEvent(DamageEntityEventData({
+        data.targetComponent.node.sendEvent(HitEventData({
             attackerComponent: this
         }));
     }
 
+    /**
+     * Called when we have been attacked by something
+     * @param data
+     */
+    onHit(data: HitEvent) {
+        this.DEBUG("Got hit by something");
+        // calculate damage and then send the damage event
+        this.node.sendEvent(DamageEntityEventData({
+            // TODO: calculate smarter
+            value: 1
+        }));
+    }
 
 
 }

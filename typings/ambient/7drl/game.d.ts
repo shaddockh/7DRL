@@ -29,5 +29,6 @@ declare module "Game" {
         attackable: boolean;
         // TODO: Not sure I like this here
         entityComponent: Atomic.JSComponent;
+        deleted?: boolean;
     }
 }

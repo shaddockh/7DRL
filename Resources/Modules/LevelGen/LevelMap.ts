@@ -70,11 +70,13 @@ export class LevelMap extends Grid<MapCell> {
      * @param callback 
      */
     iterateEntitiesAt(pos: Position2d, callback: (e: EntityData) => boolean | null) {
-        this.entities.forEach((e) => {
-            let ePos = e.gridPosition;
-            if (ePos[0] == pos[0] && ePos[1] == pos[1]) {
-                if (callback(e)) {
-                    return;
+        this.entities.forEach((e, idx) => {
+            if (!e.deleted) {
+                let ePos = e.gridPosition;
+                if (ePos[0] == pos[0] && ePos[1] == pos[1]) {
+                    if (callback(e)) {
+                        return;
+                    }
                 }
             }
         });
@@ -84,18 +86,29 @@ export class LevelMap extends Grid<MapCell> {
      * Build up an index of interesting things to be able to quickly retreive on the level such as walkable tiles, etc.
      */
     buildIndex() {
-        if (!this.indexed) {
+        //if (!this.indexed) {
+        //TODO: Optimize!!
 
-            let walkables: IndexedMapCell[] = [];
-            this.iterate((x, y, cell) => {
-                if (cell.walkable) {
+        let walkables: IndexedMapCell[] = [];
+        this.iterate((x, y, cell) => {
+            if (cell.walkable) {
+                let clear = true;
+                this.iterateEntitiesAt([x, y], (e) => {
+                    if (e.blocksPath) {
+                        clear = false;
+                        return true;
+                    }
+                });
+
+                if (clear) {
                     walkables.push(new IndexedMapCell(cell, x, y));
                 }
-            });
+            }
+        });
 
-            this.walkables = walkables;
-            this.indexed = true;
-        }
+        this.walkables = walkables;
+        this.indexed = true;
+        //}
     }
 
     /**

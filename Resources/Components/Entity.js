@@ -10,6 +10,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+var CustomEvents_1 = require("Modules/CustomEvents");
 var CustomJSComponent_1 = require("Modules/CustomJSComponent");
 "atomic component";
 var Entity = (function (_super) {
@@ -22,6 +23,7 @@ var Entity = (function (_super) {
             bumpable: false,
             attackable: false
         };
+        _this.deleted = false;
         return _this;
     }
     Object.defineProperty(Entity.prototype, "gridPosition", {
@@ -39,8 +41,13 @@ var Entity = (function (_super) {
         enumerable: true,
         configurable: true
     });
-    Entity.prototype.start = function () { };
+    Entity.prototype.start = function () {
+        this.subscribeToEvent(this.node, CustomEvents_1.DestroyEntityEvent(this.onDestroy.bind(this)));
+    };
     Entity.prototype.update = function (timeStep) { };
+    Entity.prototype.onDestroy = function () {
+        this.deleted = true;
+    };
     return Entity;
 }(CustomJSComponent_1.default));
 exports.default = Entity;

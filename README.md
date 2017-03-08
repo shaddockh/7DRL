@@ -52,3 +52,8 @@ __Ideas__
 - looked into using html for the ui with an embedded web view, but those don't look like they get deployed when you build, so that idea is out.  So basically, back to using TB for the ui.
 - discovered that you need to periodically re-import assets after generating the prefabs since the cache gets out of sync.  This might be something the blueprint plugin should automatically do on generation.
 - start adding configuration to the monster ai
+
+### Day 4 - March 7, 2017
+- work on attack mechanic
+- player can kill creatures
+- creatures also accidentally kill themselves, but hey, it's progress

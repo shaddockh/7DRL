@@ -30,7 +30,12 @@ export const entity_player = {
         attackable: true,
         blocksPath: true
     },
-    PlayerAi: {}
+    PlayerAi: {},
+    Health: {
+        debug: true,
+        life: 5
+    }
+
 };
 
 export const entity_beetle = {
@@ -45,5 +50,9 @@ export const entity_beetle = {
     },
     BasicMonsterAi: {
         wanderChance: 23
-    } as BasicMonsterAiProps
+    } as BasicMonsterAiProps,
+    Health: {
+        debug: true,
+        life: 2
+    }
 };

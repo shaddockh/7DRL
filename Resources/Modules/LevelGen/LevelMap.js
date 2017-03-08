@@ -64,11 +64,13 @@ var LevelMap = (function (_super) {
      * @param callback
      */
     LevelMap.prototype.iterateEntitiesAt = function (pos, callback) {
-        this.entities.forEach(function (e) {
-            var ePos = e.gridPosition;
-            if (ePos[0] == pos[0] && ePos[1] == pos[1]) {
-                if (callback(e)) {
-                    return;
+        this.entities.forEach(function (e, idx) {
+            if (!e.deleted) {
+                var ePos = e.gridPosition;
+                if (ePos[0] == pos[0] && ePos[1] == pos[1]) {
+                    if (callback(e)) {
+                        return;
+                    }
                 }
             }
         });
@@ -77,16 +79,27 @@ var LevelMap = (function (_super) {
      * Build up an index of interesting things to be able to quickly retreive on the level such as walkable tiles, etc.
      */
     LevelMap.prototype.buildIndex = function () {
-        if (!this.indexed) {
-            var walkables_1 = [];
-            this.iterate(function (x, y, cell) {
-                if (cell.walkable) {
-                    walkables_1.push(new IndexedMapCell(cell, x, y));
+        //if (!this.indexed) {
+        //TODO: Optimize!!
+        var _this = this;
+        var walkables = [];
+        this.iterate(function (x, y, cell) {
+            if (cell.walkable) {
+                var clear_1 = true;
+                _this.iterateEntitiesAt([x, y], function (e) {
+                    if (e.blocksPath) {
+                        clear_1 = false;
+                        return true;
+                    }
+                });
+                if (clear_1) {
+                    walkables.push(new IndexedMapCell(cell, x, y));
                 }
-            });
-            this.walkables = walkables_1;
-            this.indexed = true;
-        }
+            }
+        });
+        this.walkables = walkables;
+        this.indexed = true;
+        //}
     };
     /**
      * Look through an find an empty walkable tile

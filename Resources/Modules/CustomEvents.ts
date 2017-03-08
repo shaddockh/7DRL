@@ -65,14 +65,23 @@ export const BumpEntityEventData = CustomEventFactory.buildEventData<ComponentNo
 export const AttackEntityEvent = CustomEventFactory.buildEvent<ComponentNotificationEvent>("AttackEntity");
 export const AttackEntityEventData = CustomEventFactory.buildEventData<ComponentNotificationEvent>("AttackEntity");
 
+export const DestroyEntityEvent = CustomEventFactory.buildNotifyEvent("DestroyEntity");
+export const DestroyEntityEventData = CustomEventFactory.buildNotifyEventData("DestroyEntity");
+
 export interface DamageEntityEvent {
-    // TODO: maybe pass a common interface for calling back to get damage so we don't care what component sent it?
-    // ie: DamageHandler { getAttackDamage(defender:DefenderInterface)}
-    attackerComponent: Atomic.JSComponent;
+    value: number;
 }
 
 export const DamageEntityEvent = CustomEventFactory.buildEvent<DamageEntityEvent>("DamageEntity");
 export const DamageEntityEventData = CustomEventFactory.buildEventData<DamageEntityEvent>("DamageEntity");
+
+export interface HitEvent {
+    // TODO: maybe pass a common interface for calling back to get damage so we don't care what component sent it?
+    // ie: DamageHandler { getAttackDamage(defender:DefenderInterface)}
+    attackerComponent: Atomic.JSComponent;
+}
+export const HitEvent = CustomEventFactory.buildEvent<HitEvent>("Hit");
+export const HitEventData = CustomEventFactory.buildEventData<HitEvent>("Hit");
 
 export const SkipTurnEvent = CustomEventFactory.buildNotifyEvent("SkipTurn");
 export const SkipTurnEventData = CustomEventFactory.buildNotifyEventData("SkipTurn");

@@ -28,7 +28,11 @@ exports.entity_player = {
         attackable: true,
         blocksPath: true
     },
-    PlayerAi: {}
+    PlayerAi: {},
+    Health: {
+        debug: true,
+        life: 5
+    }
 };
 exports.entity_beetle = {
     inherits: "entity_actor",
@@ -42,6 +46,10 @@ exports.entity_beetle = {
     },
     BasicMonsterAi: {
         wanderChance: 23
+    },
+    Health: {
+        debug: true,
+        life: 2
     }
 };
 //# sourceMappingURL=entities.js.map

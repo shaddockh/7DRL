@@ -34,6 +34,8 @@ var PlayerAi = (function (_super) {
         this.subscribeToEvent(this.node, CustomEvents_1.BumpEntityEvent(this.onHandleBump.bind(this)));
         // called when we want to attack something
         this.subscribeToEvent(this.node, CustomEvents_1.AttackEntityEvent(this.onHandleAttackEntity.bind(this)));
+        // called when we have been hit by something
+        this.subscribeToEvent(this.node, CustomEvents_1.HitEvent(this.onHit.bind(this)));
         this.sendEvent(CustomEvents_1.RegisterActorAiEventData({ ai: this }));
     };
     PlayerAi.prototype.act = function () {
@@ -102,8 +104,20 @@ var PlayerAi = (function (_super) {
         this.DEBUG("Attack Entity");
         this.DEBUG(data.targetComponent.typeName);
         // figure out damage and send it over
-        data.targetComponent.node.sendEvent(CustomEvents_1.DamageEntityEventData({
+        data.targetComponent.node.sendEvent(CustomEvents_1.HitEventData({
             attackerComponent: this
+        }));
+    };
+    /**
+     * Called when we have been attacked by something
+     * @param data
+     */
+    PlayerAi.prototype.onHit = function (data) {
+        this.DEBUG("Got hit by something");
+        // calculate damage and then send the damage event
+        this.node.sendEvent(CustomEvents_1.DamageEntityEventData({
+            // TODO: calculate smarter
+            value: 1
         }));
     };
     return PlayerAi;

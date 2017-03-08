@@ -24,12 +24,13 @@ var BasicMonsterAi = (function (_super) {
          */
         _this.inspectorFields = {
             debug: true,
-            wanderChance: 25
+            wanderChance: 25,
         };
         /**
          * Chance
          */
         _this.wanderChance = 25;
+        _this.alive = true;
         return _this;
     }
     BasicMonsterAi.prototype.start = function () {
@@ -39,6 +40,10 @@ var BasicMonsterAi = (function (_super) {
         this.subscribeToEvent(this.node, CustomEvents_1.BumpEntityEvent(this.onHandleBump.bind(this)));
         // called when we want to attack something
         this.subscribeToEvent(this.node, CustomEvents_2.AttackEntityEvent(this.onHandleAttackEntity.bind(this)));
+        // called when we have been hit by something
+        this.subscribeToEvent(this.node, CustomEvents_2.HitEvent(this.onHit.bind(this)));
+        // called when entity should be destroyed
+        this.subscribeToEvent(this.node, CustomEvents_1.DestroyEntityEvent(this.onDestroy.bind(this)));
         this.sendEvent(CustomEvents_2.RegisterActorAiEventData({ ai: this }));
         // TODO: Change this to some kind of event system where whichever component provides movement handling
         // publishes an event that this can subscribe to.
@@ -53,55 +58,57 @@ var BasicMonsterAi = (function (_super) {
     });
     BasicMonsterAi.prototype.act = function () {
         var _this = this;
-        this.DEBUG("Act");
-        var currentLevel = this.node.scene.getJSComponent("LevelController").currentLevel;
-        if (this.wanderChance > Math.random() * 100) {
-            // scan around for somewhere to randomly move
-            var emptyFloor = currentLevel.findEmptyFloorCellInRadius(this.gridPosition, 1);
-            if (emptyFloor) {
-                // this.DEBUG("moving to target:");
-                // this.DEBUG("empty floor");
-                // this.DEBUG(emptyFloor);
-                // const floorPos = vec2.fromValues(emptyFloor.x, emptyFloor.y);
-                var floorPos = [emptyFloor.x, emptyFloor.y];
-                // this.DEBUG(floorPos);
-                // this.DEBUG("grid position");
-                // this.DEBUG(this.gridPosition);
-                // const targetPos = vec2.sub(vec2.create(), floorPos, this.gridPosition) as Position2d;
-                // NOT WORKING FOR SOME REASON!!
-                var targetPos_1 = [emptyFloor.x < this.gridPosition[0] ? -1 : 1, emptyFloor.y < this.gridPosition[1] ? -1 : 1];
-                if (targetPos_1[0] != 0 && targetPos_1[1] != 0) {
-                    // choose one so we move in a cardinal direction
-                    if (Math.random() * 100 > 50) {
-                        targetPos_1[0] = 0;
+        if (this.alive) {
+            this.DEBUG("Act");
+            var currentLevel = this.node.scene.getJSComponent("LevelController").currentLevel;
+            if (this.wanderChance > Math.random() * 100) {
+                // scan around for somewhere to randomly move
+                var emptyFloor = currentLevel.findEmptyFloorCellInRadius(this.gridPosition, 1);
+                if (emptyFloor) {
+                    // this.DEBUG("moving to target:");
+                    // this.DEBUG("empty floor");
+                    // this.DEBUG(emptyFloor);
+                    // const floorPos = vec2.fromValues(emptyFloor.x, emptyFloor.y);
+                    var floorPos = [emptyFloor.x, emptyFloor.y];
+                    // this.DEBUG(floorPos);
+                    // this.DEBUG("grid position");
+                    // this.DEBUG(this.gridPosition);
+                    // const targetPos = vec2.sub(vec2.create(), floorPos, this.gridPosition) as Position2d;
+                    // NOT WORKING FOR SOME REASON!!
+                    var targetPos_1 = [emptyFloor.x < this.gridPosition[0] ? -1 : 1, emptyFloor.y < this.gridPosition[1] ? -1 : 1];
+                    if (targetPos_1[0] != 0 && targetPos_1[1] != 0) {
+                        // choose one so we move in a cardinal direction
+                        if (Math.random() * 100 > 50) {
+                            targetPos_1[0] = 0;
+                        }
+                        else {
+                            targetPos_1[1] = 0;
+                        }
                     }
-                    else {
-                        targetPos_1[1] = 0;
+                    // this.DEBUG("target position");
+                    // this.DEBUG(targetPos);
+                    // Let's defer the movement to the next update so we have time
+                    // to wire up the resolve.
+                    this.deferAction(function () {
+                        _this.node.sendEvent(CustomEvents_2.MoveEntityByOffsetEventData({
+                            position: targetPos_1
+                        }));
+                    });
+                }
+                else {
+                    this.DEBUG("Couldn't find an empty floor");
+                }
+                // we are returning a 'thenable' which tells the scheduler to not move on to the next actor
+                // until this actor has completed.  This is overriding the onTurnTaken event on this class with
+                // the callback passed to the then method, which means that when this class gets an onTurnTaken
+                // event, it will resolve the then.
+                // See: http://ondras.github.io/rot.js/manual/#timing/engine for some more information.
+                return {
+                    then: function (resolve) {
+                        _this.deferAction(resolve, CustomEvents_2.ActionCompleteEventType);
                     }
-                }
-                // this.DEBUG("target position");
-                // this.DEBUG(targetPos);
-                // Let's defer the movement to the next update so we have time
-                // to wire up the resolve.
-                this.deferAction(function () {
-                    _this.node.sendEvent(CustomEvents_2.MoveEntityByOffsetEventData({
-                        position: targetPos_1
-                    }));
-                });
+                };
             }
-            else {
-                this.DEBUG("Couldn't find an empty floor");
-            }
-            // we are returning a 'thenable' which tells the scheduler to not move on to the next actor
-            // until this actor has completed.  This is overriding the onTurnTaken event on this class with
-            // the callback passed to the then method, which means that when this class gets an onTurnTaken
-            // event, it will resolve the then.
-            // See: http://ondras.github.io/rot.js/manual/#timing/engine for some more information.
-            return {
-                then: function (resolve) {
-                    _this.deferAction(resolve, CustomEvents_2.ActionCompleteEventType);
-                }
-            };
         }
     };
     BasicMonsterAi.prototype.onMoveComplete = function () {
@@ -131,8 +138,20 @@ var BasicMonsterAi = (function (_super) {
     BasicMonsterAi.prototype.onHandleAttackEntity = function (data) {
         this.DEBUG("Attack Entity");
         // figure out damage and send it over
-        data.targetComponent.node.sendEvent(CustomEvents_2.DamageEntityEventData({
+        data.targetComponent.node.sendEvent(CustomEvents_1.HitEventData({
             attackerComponent: this
+        }));
+    };
+    /**
+     * Called when we have been attacked by something
+     * @param data
+     */
+    BasicMonsterAi.prototype.onHit = function (data) {
+        this.DEBUG("Got hit by something");
+        // calculate damage and then send the damage event
+        this.node.sendEvent(CustomEvents_2.DamageEntityEventData({
+            // TODO: calculate smarter
+            value: 1
         }));
     };
     BasicMonsterAi.prototype.onActionComplete = function () {
@@ -147,6 +166,14 @@ var BasicMonsterAi = (function (_super) {
             });
         }
         */
+    };
+    BasicMonsterAi.prototype.onDestroy = function () {
+        var _this = this;
+        this.DEBUG("Destroy");
+        this.alive = false;
+        this.deferAction(function () {
+            Atomic.destroy(_this.node);
+        });
     };
     return BasicMonsterAi;
 }(CustomJSComponent_1.default));
