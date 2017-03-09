@@ -25,10 +25,12 @@ import {
     HitEvent
 } from "Modules/CustomEvents";
 import LevelController from "Components/LevelController";
-import { Position2d } from "Game";
+import { Position2d, Attacker } from "Game";
 import GridMover from "Components/GridMover";
 import { vec2 } from "gl-matrix";
 import Entity from "Components/Entity";
+import Attack from "Components/Attack";
+import { Actionable } from "rot";
 "atomic component";
 
 /**
@@ -43,7 +45,7 @@ export interface BasicMonsterAiProps {
     wanderChance?: number;
 };
 
-export default class BasicMonsterAi extends CustomJSComponent {
+export default class BasicMonsterAi extends CustomJSComponent implements Attacker, Actionable {
     /**
      * Fields witihin the inspectorFields object will be exposed to the editor
      */
@@ -160,6 +162,7 @@ export default class BasicMonsterAi extends CustomJSComponent {
         if (entityComponent.attackable) {
             // here we need to recreate the event object because it will get GCd
             this.node.sendEvent(AttackEntityEventData({
+                senderComponent: this,
                 targetComponent: data.targetComponent
             }));
         }
@@ -171,12 +174,12 @@ export default class BasicMonsterAi extends CustomJSComponent {
      */
     onHandleAttackEntity(data: ComponentNotificationEvent) {
         this.DEBUG("Attack Entity");
+        this.DEBUG(data.targetComponent.typeName);
         // figure out damage and send it over
         data.targetComponent.node.sendEvent(HitEventData({
             attackerComponent: this
         }));
     }
-
 
     /**
      * Called when we have been attacked by something
@@ -186,9 +189,18 @@ export default class BasicMonsterAi extends CustomJSComponent {
         this.DEBUG("Got hit by something");
         // calculate damage and then send the damage event
         this.node.sendEvent(DamageEntityEventData({
-            // TODO: calculate smarter
-            value: 1
+            value: data.attackerComponent.calculateAttackValue()
         }));
+    }
+
+    /* Attacker Interface */
+    calculateAttackValue(): number {
+        const attack = this.node.getJSComponent<Attack>("Attack");
+        if (Attack) {
+            return this.node.getJSComponent<Attack>("Attack").attackValue;
+        }
+
+        throw new Error("No attack component defined!");
     }
 
     onActionComplete() {

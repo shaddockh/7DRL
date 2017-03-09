@@ -57,10 +57,11 @@ var GridMover = (function (_super) {
     };
     Object.defineProperty(GridMover.prototype, "gridPosition", {
         get: function () {
-            return this.gridPosition_;
+            // TODO: the position provider should send an event announcing itself
+            return this.node.getJSComponent("Entity").gridPosition;
         },
-        set: function (pos) {
-            this.gridPosition_ = pos;
+        set: function (value) {
+            this.node.getJSComponent("Entity").gridPosition = value;
         },
         enumerable: true,
         configurable: true
@@ -105,12 +106,17 @@ var GridMover = (function (_super) {
                         // this.queuePostMoveAction(() => {
                         _this.DEBUG("Blocked by Entity");
                         _this.node.sendEvent(CustomEvents.MoveEntityBlockedEventData({ from: mapPos_1, to: newMapPos_1 }));
-                        _this.node.sendEvent(CustomEvents.MoveEntityCompleteEventData());
-                        // });
+                        if (!entity.bumpable) {
+                            // Bump event will send the move complete
+                            _this.node.sendEvent(CustomEvents.MoveEntityCompleteEventData());
+                        }
                     }
                     if (entity.bumpable) {
                         // Let's exit the loop since we only want to deal with the first entity
-                        _this.node.sendEvent(CustomEvents.BumpEntityEventData({ targetComponent: entity.entityComponent }));
+                        _this.node.sendEvent(CustomEvents.BumpEntityEventData({
+                            senderComponent: _this,
+                            targetComponent: entity.entityComponent
+                        }));
                         return false;
                     }
                     else {

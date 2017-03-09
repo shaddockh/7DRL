@@ -5,15 +5,17 @@ import { MoveEntityCompleteEvent } from "Modules/CustomEvents";
 import CustomJSComponent from "Modules/CustomJSComponent";
 "atomic component";
 
-export default class EntityOrderRenderer extends CustomJSComponent {
+export default class EntityRenderOptions extends CustomJSComponent {
     inspectorFields = {
         debug: true,
         orderInLayer: 2,
-        slicesInLayer: 4
+        slicesInLayer: 4,
+        yOffset: 40
     };
 
-    private orderInLayer: number;
-    private slicesInLayer = 4;
+    orderInLayer: number;
+    slicesInLayer = 4;
+    yOffset = 40;
 
     get gridPosition(): Position2d {
         return this.node.getJSComponent<Entity>("Entity").gridPosition;
@@ -25,6 +27,7 @@ export default class EntityOrderRenderer extends CustomJSComponent {
 
     start() {
         this.subscribeToEvent(this.node, MoveEntityCompleteEvent(this.onMoveEntityComplete.bind(this)));
+        this.onMoveEntityComplete();
     }
 
     onMoveEntityComplete() {

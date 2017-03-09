@@ -17,6 +17,7 @@ declare module "rot" {
         interface Scheduler {
             add(item: Actionable, repeat: boolean);
             remove(item: Actionable);
+            clear();
         }
 
         module Scheduler {
@@ -24,6 +25,7 @@ declare module "rot" {
             class Simple implements Scheduler {
                 add(item: Actionable, repeat: boolean);
                 remove(item: Actionable);
+                clear();
             }
         }
 

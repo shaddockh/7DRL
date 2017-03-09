@@ -57,3 +57,9 @@ __Ideas__
 - work on attack mechanic
 - player can kill creatures
 - creatures also accidentally kill themselves, but hey, it's progress
+
+### Day 5 - March 8, 2017
+- work on events to notify actors when they attack or have been hit. or bumped.
+- work on attack system to callback to the attacker to determine how much damage should be applied
+- tuning the rendering of entities at different offsets within the grid cell
+- added ability to generate multiple levels.  As the player moves through them, the player is persisted between the levels, but everything else is destroyed

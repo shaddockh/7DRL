@@ -1,3 +1,7 @@
+export interface CustomJSComponentInspectorFields {
+    debug?: boolean;
+}
+
 export default class CustomJSComponent extends Atomic.JSComponent {
     debug = false;
     private _componentName: string = null;

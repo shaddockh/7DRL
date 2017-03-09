@@ -31,4 +31,8 @@ declare module "Game" {
         entityComponent: Atomic.JSComponent;
         deleted?: boolean;
     }
+
+    export interface Attacker {
+        calculateAttackValue(): number;
+    }
 }

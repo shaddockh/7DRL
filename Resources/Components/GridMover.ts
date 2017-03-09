@@ -61,12 +61,14 @@ export default class GridMover extends CustomJSComponent {
         }
     }
 
-    private gridPosition_: Position2d;
+
     get gridPosition(): Position2d {
-        return this.gridPosition_;
+        // TODO: the position provider should send an event announcing itself
+        return this.node.getJSComponent<Entity>("Entity").gridPosition;
     }
-    set gridPosition(pos: Position2d) {
-        this.gridPosition_ = pos;
+
+    set gridPosition(value: Position2d) {
+        this.node.getJSComponent<Entity>("Entity").gridPosition = value;
     }
 
     onTryMoveByOffset(data: CustomEvents.MoveEntityEvent) {
@@ -112,12 +114,18 @@ export default class GridMover extends CustomJSComponent {
                         // this.queuePostMoveAction(() => {
                         this.DEBUG("Blocked by Entity");
                         this.node.sendEvent(CustomEvents.MoveEntityBlockedEventData({ from: mapPos, to: newMapPos }));
-                        this.node.sendEvent(CustomEvents.MoveEntityCompleteEventData());
-                        // });
+
+                        if (!entity.bumpable) {
+                            // Bump event will send the move complete
+                            this.node.sendEvent(CustomEvents.MoveEntityCompleteEventData());
+                        }
                     }
                     if (entity.bumpable) {
                         // Let's exit the loop since we only want to deal with the first entity
-                        this.node.sendEvent(CustomEvents.BumpEntityEventData({ targetComponent: entity.entityComponent }));
+                        this.node.sendEvent(CustomEvents.BumpEntityEventData({
+                            senderComponent: this,
+                            targetComponent: entity.entityComponent
+                        }));
                         return false;
                     } else {
                         return true;

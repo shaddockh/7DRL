@@ -13,6 +13,7 @@ var LevelGenerator = (function () {
         this.DEBUG("Generating level: " + this.width + "," + this.height);
         var level = new LevelMap_1.LevelMap(this.width, this.height);
         this.generateTerrain(level);
+        // this.generateExit(level);
         this.generateEntities(level);
         if (this.debug) {
             console.log("Generated Level:");
@@ -49,6 +50,20 @@ var LevelGenerator = (function () {
                 _this.DEBUG("assigning to tile out of bounds: " + x + "," + y);
             }
         });
+        // Grab a random room
+        var roomSections = builder["rooms"];
+        var roomlist = roomSections[1];
+        var room = roomlist.pop();
+        console.log(JSON.stringify(room, null, 2));
+        level.addEntity({
+            gridPosition: [room.x, room.y + room.height],
+            blueprint: "entity_exit_door",
+            blocksPath: false,
+            bumpable: true,
+            entityComponent: null,
+            attackable: false
+        });
+        level.getCell(room.x, room.y + room.height).terrainType = 2 /* floor */;
     };
     LevelGenerator.prototype.generateEntities = function (level) {
         // First generate the player
@@ -74,6 +89,17 @@ var LevelGenerator = (function () {
                 attackable: false
             });
         }
+    };
+    LevelGenerator.prototype.generateExit = function (level) {
+        var emptyFloor = level.findEmptyFloorCell();
+        level.addEntity({
+            gridPosition: [emptyFloor.x, emptyFloor.y],
+            blueprint: "entity_exit_door",
+            blocksPath: false,
+            bumpable: true,
+            entityComponent: null,
+            attackable: false
+        });
     };
     LevelGenerator.prototype.DEBUG = function (message) {
         if (this.debug) {

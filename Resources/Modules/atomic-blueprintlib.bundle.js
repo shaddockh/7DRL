@@ -39,7 +39,7 @@
         var RESOURCES_DIR = "Resources";
         var PREFABS_DIR = "Prefabs";
         var GENERATED_PREFABS_DIR = Atomic.addTrailingSlash(PREFABS_DIR) + "Generated";
-        var DEBUG = true;
+        var DEBUG = false;
         function debug(message) {
             if (DEBUG) {
                 console.log(message);

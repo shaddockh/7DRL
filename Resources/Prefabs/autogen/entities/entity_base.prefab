@@ -12,8 +12,14 @@
 	</component>
 	<component type="JSComponent" id="16777216">
 		<attribute name="ComponentFile" value="JSComponentFile;Components/Entity.js" />
+		<attribute name="FieldValues">
+			<variant name="debug" type="Bool" value="true" />
+		</attribute>
 	</component>
 	<component type="JSComponent" id="16777217">
-		<attribute name="ComponentFile" value="JSComponentFile;Components/EntityOrderRenderer.js" />
+		<attribute name="ComponentFile" value="JSComponentFile;Components/EntityRenderOptions.js" />
+		<attribute name="FieldValues">
+			<variant name="yOffset" type="Float" value="40" />
+		</attribute>
 	</component>
 </node>

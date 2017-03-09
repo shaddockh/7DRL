@@ -79,8 +79,8 @@ var LevelMap = (function (_super) {
      * Build up an index of interesting things to be able to quickly retreive on the level such as walkable tiles, etc.
      */
     LevelMap.prototype.buildIndex = function () {
-        //if (!this.indexed) {
-        //TODO: Optimize!!
+        // if (!this.indexed) {
+        // TODO: Optimize!!
         var _this = this;
         var walkables = [];
         this.iterate(function (x, y, cell) {
@@ -99,7 +99,7 @@ var LevelMap = (function (_super) {
         });
         this.walkables = walkables;
         this.indexed = true;
-        //}
+        // }
     };
     /**
      * Look through an find an empty walkable tile

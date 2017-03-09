@@ -1,4 +1,7 @@
+import { EntityData } from "Game";
+import { AttackInspectorFields } from "../../Components/Attack";
 import { BasicMonsterAiProps } from "../../Components/ai/BasicMonsterAi";
+import { DoorInspectorFields } from "Components/Door";
 
 export const entity_base = {
     prefabDir: "Prefabs/autogen/entities",
@@ -7,8 +10,30 @@ export const entity_base = {
         sprite: "Sprites/PlanetCute/CharacterBoy.png",
         blendMode: Atomic.BlendMode.BLEND_ALPHA
     },
-    Entity: {},
-    EntityOrderRenderer: {}
+    Entity: {
+        debug: true
+    },
+    EntityRenderOptions: {
+        yOffset: 40
+    }
+};
+
+export const entity_exit_door = {
+    inherits: "entity_base",
+    StaticSprite2D: {
+        sprite: "Sprites/PlanetCute/DoorTallClosed.png"
+    },
+    Entity: <EntityData>{
+        blocksPath: true,
+        bumpable: true
+    },
+    EntityRenderOptions: {
+        yOffset: 20
+    },
+    Door: <DoorInspectorFields>{
+        debug: true
+    }
+
 };
 
 export const entity_actor = {
@@ -33,9 +58,11 @@ export const entity_player = {
     PlayerAi: {},
     Health: {
         debug: true,
-        life: 5
+        life: 15
+    },
+    Attack: <AttackInspectorFields>{
+        attackValue: 1
     }
-
 };
 
 export const entity_beetle = {
@@ -54,5 +81,8 @@ export const entity_beetle = {
     Health: {
         debug: true,
         life: 2
+    },
+    Attack: <AttackInspectorFields>{
+        attackValue: 1
     }
 };

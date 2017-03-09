@@ -11,6 +11,7 @@ export default class LevelGenerator {
         this.DEBUG(`Generating level: ${this.width},${this.height}`);
         const level = new LevelMap(this.width, this.height);
         this.generateTerrain(level);
+        // this.generateExit(level);
         this.generateEntities(level);
 
         if (this.debug) {
@@ -45,6 +46,31 @@ export default class LevelGenerator {
                 this.DEBUG(`assigning to tile out of bounds: ${x},${y}`);
             }
         });
+
+        // Grab a random room
+        let roomSections = builder["rooms"];
+        let roomlist = roomSections[1];
+        let room = roomlist.pop() as {
+            x: number,
+            y: number,
+            width: number,
+            height: number,
+            connections: [[number, number]],
+            cellx: number,
+            celly: number
+        };
+
+        console.log(JSON.stringify(room, null, 2));
+
+        level.addEntity({
+            gridPosition: [room.x, room.y + room.height],
+            blueprint: "entity_exit_door",
+            blocksPath: false,
+            bumpable: true,
+            entityComponent: null,
+            attackable: false
+        });
+        level.getCell(room.x, room.y + room.height).terrainType = TerrainType.floor;
     }
 
     private generateEntities(level: LevelMap) {
@@ -72,6 +98,18 @@ export default class LevelGenerator {
                 attackable: false
             });
         }
+    }
+
+    private generateExit(level: LevelMap) {
+        let emptyFloor = level.findEmptyFloorCell();
+        level.addEntity({
+            gridPosition: [emptyFloor.x, emptyFloor.y],
+            blueprint: "entity_exit_door",
+            blocksPath: false,
+            bumpable: true,
+            entityComponent: null,
+            attackable: false
+        });
     }
 
     DEBUG(message: string) {

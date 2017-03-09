@@ -7,8 +7,28 @@ exports.entity_base = {
         sprite: "Sprites/PlanetCute/CharacterBoy.png",
         blendMode: Atomic.BlendMode.BLEND_ALPHA
     },
-    Entity: {},
-    EntityOrderRenderer: {}
+    Entity: {
+        debug: true
+    },
+    EntityRenderOptions: {
+        yOffset: 40
+    }
+};
+exports.entity_exit_door = {
+    inherits: "entity_base",
+    StaticSprite2D: {
+        sprite: "Sprites/PlanetCute/DoorTallClosed.png"
+    },
+    Entity: {
+        blocksPath: true,
+        bumpable: true
+    },
+    EntityRenderOptions: {
+        yOffset: 20
+    },
+    Door: {
+        debug: true
+    }
 };
 exports.entity_actor = {
     inherits: "entity_base",
@@ -31,7 +51,10 @@ exports.entity_player = {
     PlayerAi: {},
     Health: {
         debug: true,
-        life: 5
+        life: 15
+    },
+    Attack: {
+        attackValue: 1
     }
 };
 exports.entity_beetle = {
@@ -50,6 +73,9 @@ exports.entity_beetle = {
     Health: {
         debug: true,
         life: 2
+    },
+    Attack: {
+        attackValue: 1
     }
 };
 //# sourceMappingURL=entities.js.map

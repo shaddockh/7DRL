@@ -10,7 +10,8 @@ export default class Entity extends CustomJSComponent implements EntityData {
         debug: true,
         blocksPath: false,
         bumpable: false,
-        attackable: false
+        attackable: false,
+        usable: false
     };
 
     blocksPath: boolean;
@@ -18,10 +19,16 @@ export default class Entity extends CustomJSComponent implements EntityData {
     attackable: boolean;
     blueprint: any;
     deleted = false;
+    // TODO: maybe move this into a "Usable" component
+    usable: boolean;
 
+    private gridPosition_: Position2d;
     get gridPosition(): Position2d {
-        // TODO: the position provider should send an event announcing itself
-        return this.node.getJSComponent<GridMover>("GridMover").gridPosition;
+        return this.gridPosition_;
+    }
+
+    set gridPosition(pos: Position2d) {
+        this.gridPosition_ = pos;
     }
 
     get entityComponent(): Atomic.JSComponent {

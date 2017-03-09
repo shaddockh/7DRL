@@ -13,6 +13,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var CustomEvents_1 = require("../../Modules/CustomEvents");
 var CustomJSComponent_1 = require("Modules/CustomJSComponent");
 var CustomEvents_2 = require("Modules/CustomEvents");
+var Attack_1 = require("Components/Attack");
 "atomic component";
 ;
 var BasicMonsterAi = (function (_super) {
@@ -127,6 +128,7 @@ var BasicMonsterAi = (function (_super) {
         if (entityComponent.attackable) {
             // here we need to recreate the event object because it will get GCd
             this.node.sendEvent(CustomEvents_2.AttackEntityEventData({
+                senderComponent: this,
                 targetComponent: data.targetComponent
             }));
         }
@@ -137,6 +139,7 @@ var BasicMonsterAi = (function (_super) {
      */
     BasicMonsterAi.prototype.onHandleAttackEntity = function (data) {
         this.DEBUG("Attack Entity");
+        this.DEBUG(data.targetComponent.typeName);
         // figure out damage and send it over
         data.targetComponent.node.sendEvent(CustomEvents_1.HitEventData({
             attackerComponent: this
@@ -150,9 +153,16 @@ var BasicMonsterAi = (function (_super) {
         this.DEBUG("Got hit by something");
         // calculate damage and then send the damage event
         this.node.sendEvent(CustomEvents_2.DamageEntityEventData({
-            // TODO: calculate smarter
-            value: 1
+            value: data.attackerComponent.calculateAttackValue()
         }));
+    };
+    /* Attacker Interface */
+    BasicMonsterAi.prototype.calculateAttackValue = function () {
+        var attack = this.node.getJSComponent("Attack");
+        if (Attack_1.default) {
+            return this.node.getJSComponent("Attack").attackValue;
+        }
+        throw new Error("No attack component defined!");
     };
     BasicMonsterAi.prototype.onActionComplete = function () {
         this.DEBUG("OnActionComplete");

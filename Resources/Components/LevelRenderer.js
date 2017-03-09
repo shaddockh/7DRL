@@ -33,8 +33,25 @@ var LevelRenderer = (function (_super) {
     LevelRenderer.prototype.start = function () {
         this.subscribeToEvent(CustomEvents.RenderCurrentLevelEvent(this.render.bind(this)));
     };
+    LevelRenderer.prototype.clear = function () {
+        for (var i = 0; i < this.childNodes.length; i++) {
+            var node = this.childNodes[i];
+            if (node != this.player) {
+                // TODO: Maybe descend all ai classes from the same interface?
+                var ai = node.getComponent("BasicMonsterAi");
+                Atomic.destroy(this.childNodes[i]);
+            }
+        }
+        this.childNodes = [];
+        if (this.player) {
+            this.childNodes.push(this.player);
+        }
+    };
     LevelRenderer.prototype.render = function () {
         var _this = this;
+        if (this.childNodes.length) {
+            this.clear();
+        }
         this.DEBUG("About to render level");
         var currentLevel = this.node.scene.getJSComponent("LevelController").currentLevel;
         var start = new Date().getTime();
@@ -52,18 +69,37 @@ var LevelRenderer = (function (_super) {
                 }
             });
             var scaleYChar_1 = (this.gridPixelSizeY) * Atomic.PIXEL_SIZE;
-            var yOffset_1 = 40 * Atomic.PIXEL_SIZE;
+            var defaultYOffset_1 = 40 * Atomic.PIXEL_SIZE;
             currentLevel.entities.forEach(function (e, index) {
                 _this.DEBUG("About to construct entity: " + e.blueprint);
-                var entityNode = nodeBuilder.createChildAtPosition(_this.node, e.blueprint, [e.gridPosition[0] * scaleX_1, e.gridPosition[1] * scaleYChar_1 + yOffset_1]);
-                currentLevel.entities.replaceAt(index, entityNode.getJSComponent("Entity"));
-                entityNode.getComponent("StaticSprite2D").orderInLayer = ((currentLevel.height - e.gridPosition[1]) * 4) + 2;
-                // TODO: this should be less coupled.. maybe send a message
-                if (e.blueprint == "entity_player") {
-                    entityNode.getJSComponent("GridMover").subscribeToMovementController(_this.node.scene.getJSComponent("PlayerInputHandler"));
+                if (e.blueprint != "entity_player" || (e.blueprint == "entity_player" && !_this.player)) {
+                    var entityNode = nodeBuilder.createChildAtPosition(_this.node, e.blueprint, [e.gridPosition[0] * scaleX_1, e.gridPosition[1] * scaleYChar_1]);
+                    currentLevel.entities.replaceAt(index, entityNode.getJSComponent("Entity"));
+                    var ero = entityNode.getJSComponent("EntityRenderOptions");
+                    var yOffset = defaultYOffset_1;
+                    if (ero) {
+                        yOffset = ero.yOffset * Atomic.PIXEL_SIZE;
+                    }
+                    entityNode.translate2D([0, yOffset]);
+                    // TODO: this should be less coupled.. maybe send a message
+                    if (e.blueprint == "entity_player") {
+                        entityNode.getJSComponent("GridMover").subscribeToMovementController(_this.node.scene.getJSComponent("PlayerInputHandler"));
+                        _this.player = entityNode;
+                    }
+                    entityNode.getJSComponent("Entity").gridPosition = e.gridPosition;
+                    _this.childNodes.push(entityNode);
                 }
-                entityNode.getJSComponent("GridMover").gridPosition = e.gridPosition;
-                _this.childNodes.push(entityNode);
+                else {
+                    // update the player position here
+                    _this.player.getJSComponent("Entity").gridPosition = e.gridPosition;
+                    _this.player.position2D = [e.gridPosition[0] * scaleX_1, e.gridPosition[1] * scaleYChar_1];
+                    var ero = _this.player.getJSComponent("EntityRenderOptions");
+                    var yOffset = defaultYOffset_1;
+                    if (ero) {
+                        yOffset = ero.yOffset * Atomic.PIXEL_SIZE;
+                    }
+                    _this.player.translate2D([0, yOffset]);
+                }
             });
             this.node.position2D = [offsetX, offsetY];
             this.DEBUG("Changing zoom level from: " + this.node.scene.getMainCamera().zoom + " to " + this.zoom);

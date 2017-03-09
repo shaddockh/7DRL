@@ -12,6 +12,7 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var CustomJSComponent_1 = require("Modules/CustomJSComponent");
 var CustomEvents_1 = require("Modules/CustomEvents");
+var Attack_1 = require("Components/Attack");
 "atomic component";
 var PlayerAi = (function (_super) {
     __extends(PlayerAi, _super);
@@ -26,6 +27,7 @@ var PlayerAi = (function (_super) {
         return _this;
     }
     PlayerAi.prototype.start = function () {
+        var _this = this;
         // only care about move complete events from ourselves
         this.subscribeToEvent(this.node, CustomEvents_1.MoveEntityCompleteEvent(this.onMoveComplete.bind(this)));
         this.subscribeToEvent(this.node, CustomEvents_1.TurnTakenEvent(this.onTurnTaken.bind(this)));
@@ -37,6 +39,10 @@ var PlayerAi = (function (_super) {
         // called when we have been hit by something
         this.subscribeToEvent(this.node, CustomEvents_1.HitEvent(this.onHit.bind(this)));
         this.sendEvent(CustomEvents_1.RegisterActorAiEventData({ ai: this }));
+        // called when we are moving to a new level
+        this.subscribeToEvent(CustomEvents_1.RegisterLevelActorsEvent(function () {
+            _this.sendEvent(CustomEvents_1.RegisterActorAiEventData({ ai: _this }));
+        }));
     };
     PlayerAi.prototype.act = function () {
         var _this = this;
@@ -68,19 +74,6 @@ var PlayerAi = (function (_super) {
         */
         this.node.sendEvent(CustomEvents_1.ActionCompleteEventData());
     };
-    PlayerAi.prototype.onActionComplete = function () {
-        this.DEBUG("OnActionComplete");
-        // call the callback, notifying the scheduler that we are done, but
-        // wait until all pending activities have finished
-        /*
-        if (this.resolveTurn) {
-            setImmediate(() => {
-                this.DEBUG("End of turn.");
-                this.resolveTurn();
-            });
-        }
-        */
-    };
     /**
      * Called when we bump into something.
      * @param data
@@ -90,10 +83,20 @@ var PlayerAi = (function (_super) {
         // who did we bump into?
         var entityComponent = data.targetComponent.node.getJSComponent("Entity");
         if (entityComponent.attackable) {
+            this.DEBUG("preparing to attack");
             // here we need to recreate the event object because it will get GCd
             this.node.sendEvent(CustomEvents_1.AttackEntityEventData({
+                senderComponent: this,
                 targetComponent: data.targetComponent
             }));
+        }
+        else {
+            this.DEBUG("Sending bump");
+            data.targetComponent.node.sendEvent(CustomEvents_1.BumpedByEntityEventData({
+                senderComponent: this,
+                targetComponent: data.targetComponent
+            }));
+            this.node.sendEvent(CustomEvents_1.MoveEntityCompleteEventData());
         }
     };
     /**
@@ -107,6 +110,7 @@ var PlayerAi = (function (_super) {
         data.targetComponent.node.sendEvent(CustomEvents_1.HitEventData({
             attackerComponent: this
         }));
+        this.node.sendEvent(CustomEvents_1.MoveEntityCompleteEventData());
     };
     /**
      * Called when we have been attacked by something
@@ -116,9 +120,16 @@ var PlayerAi = (function (_super) {
         this.DEBUG("Got hit by something");
         // calculate damage and then send the damage event
         this.node.sendEvent(CustomEvents_1.DamageEntityEventData({
-            // TODO: calculate smarter
-            value: 1
+            value: data.attackerComponent.calculateAttackValue()
         }));
+    };
+    /* Attacker Interface */
+    PlayerAi.prototype.calculateAttackValue = function () {
+        var attack = this.node.getJSComponent("Attack");
+        if (Attack_1.default) {
+            return this.node.getJSComponent("Attack").attackValue;
+        }
+        throw new Error("No attack component defined!");
     };
     return PlayerAi;
 }(CustomJSComponent_1.default));

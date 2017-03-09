@@ -44,13 +44,18 @@ export default class LevelController extends CustomJSComponent {
 
     private loadLevel(eventData: LoadLevelEvent) {
         this.DEBUG("Loading new level");
-
-        this.scheduler = new ROT.Scheduler.Simple();
-        this.engine = new ROT.Engine(this.scheduler);
-        this.engine.start();
-
         this.currentLevel = eventData.level;
         this.sendEvent(RenderCurrentLevelEventData());
+
+        if (!this.engine) {
+
+            this.scheduler = new ROT.Scheduler.Simple();
+            this.engine = new ROT.Engine(this.scheduler);
+            this.engine.start();
+        } else {
+            this.scheduler.clear();
+        }
+
 
 
         this.sendEvent(RegisterLevelActorsEventData({

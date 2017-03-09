@@ -17,12 +17,18 @@ import {
     AttackEntityEvent,
     HitEventData,
     DamageEntityEvent,
-    HitEvent
+    HitEvent,
+    BumpedByEntityEventData,
+    MoveEntityCompleteEventData,
+    RegisterLevelActorsEvent
 } from "Modules/CustomEvents";
 import Entity from "Components/Entity";
+import { Attacker } from "Game";
+import Attack from "Components/Attack";
 "atomic component";
 
-export default class PlayerAi extends CustomJSComponent {
+export default class PlayerAi extends CustomJSComponent implements Attacker {
+
     /**
      * Fields witihin the inspectorFields object will be exposed to the editor
      */
@@ -46,6 +52,11 @@ export default class PlayerAi extends CustomJSComponent {
         this.subscribeToEvent(this.node, HitEvent(this.onHit.bind(this)));
 
         this.sendEvent(RegisterActorAiEventData({ ai: this }));
+
+        // called when we are moving to a new level
+        this.subscribeToEvent(RegisterLevelActorsEvent(() => {
+            this.sendEvent(RegisterActorAiEventData({ ai: this }));
+        }));
     }
 
     act() {
@@ -82,20 +93,6 @@ export default class PlayerAi extends CustomJSComponent {
         this.node.sendEvent(ActionCompleteEventData());
     }
 
-    onActionComplete() {
-        this.DEBUG("OnActionComplete");
-        // call the callback, notifying the scheduler that we are done, but
-        // wait until all pending activities have finished
-        /*
-        if (this.resolveTurn) {
-            setImmediate(() => {
-                this.DEBUG("End of turn.");
-                this.resolveTurn();
-            });
-        }
-        */
-    }
-
     /**
      * Called when we bump into something.
      * @param data
@@ -105,10 +102,20 @@ export default class PlayerAi extends CustomJSComponent {
         // who did we bump into?
         const entityComponent = data.targetComponent.node.getJSComponent<Entity>("Entity");
         if (entityComponent.attackable) {
+            this.DEBUG("preparing to attack");
             // here we need to recreate the event object because it will get GCd
             this.node.sendEvent(AttackEntityEventData({
+                senderComponent: this,
                 targetComponent: data.targetComponent
             }));
+        } else {
+            this.DEBUG("Sending bump");
+            data.targetComponent.node.sendEvent(BumpedByEntityEventData({
+                senderComponent: this,
+                targetComponent: data.targetComponent
+            }));
+
+            this.node.sendEvent(MoveEntityCompleteEventData());
         }
     }
 
@@ -123,6 +130,7 @@ export default class PlayerAi extends CustomJSComponent {
         data.targetComponent.node.sendEvent(HitEventData({
             attackerComponent: this
         }));
+        this.node.sendEvent(MoveEntityCompleteEventData());
     }
 
     /**
@@ -133,10 +141,18 @@ export default class PlayerAi extends CustomJSComponent {
         this.DEBUG("Got hit by something");
         // calculate damage and then send the damage event
         this.node.sendEvent(DamageEntityEventData({
-            // TODO: calculate smarter
-            value: 1
+            value: data.attackerComponent.calculateAttackValue()
         }));
     }
 
+    /* Attacker Interface */
+    calculateAttackValue(): number {
+        const attack = this.node.getJSComponent<Attack>("Attack");
+        if (Attack) {
+            return this.node.getJSComponent<Attack>("Attack").attackValue;
+        }
+
+        throw new Error("No attack component defined!");
+    }
 
 }

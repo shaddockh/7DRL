@@ -1,6 +1,6 @@
 
 import { LevelMap } from "Modules/LevelGen/LevelMap";
-import { Position2d } from "Game";
+import { Position2d, Attacker } from "Game";
 import LevelController from "Components/LevelController";
 import * as CustomEventFactory from "./CustomEventFactory";
 import * as ROT from "rot";
@@ -57,6 +57,7 @@ export const LogMessageEvent = CustomEventFactory.buildEvent<LogMessage>("LogMes
 export const LogMessageEventData = CustomEventFactory.buildEventData<LogMessage>("LogMessage");
 
 export interface ComponentNotificationEvent {
+    senderComponent: Atomic.JSComponent;
     targetComponent: Atomic.JSComponent;
 }
 export const BumpEntityEvent = CustomEventFactory.buildEvent<ComponentNotificationEvent>("BumpEntity");
@@ -64,6 +65,9 @@ export const BumpEntityEventData = CustomEventFactory.buildEventData<ComponentNo
 
 export const AttackEntityEvent = CustomEventFactory.buildEvent<ComponentNotificationEvent>("AttackEntity");
 export const AttackEntityEventData = CustomEventFactory.buildEventData<ComponentNotificationEvent>("AttackEntity");
+
+export const BumpedByEntityEvent = CustomEventFactory.buildEvent<ComponentNotificationEvent>("BumpedByEntity");
+export const BumpedByEntityEventData = CustomEventFactory.buildEventData<ComponentNotificationEvent>("BumpedByEntity");
 
 export const DestroyEntityEvent = CustomEventFactory.buildNotifyEvent("DestroyEntity");
 export const DestroyEntityEventData = CustomEventFactory.buildNotifyEventData("DestroyEntity");
@@ -78,8 +82,9 @@ export const DamageEntityEventData = CustomEventFactory.buildEventData<DamageEnt
 export interface HitEvent {
     // TODO: maybe pass a common interface for calling back to get damage so we don't care what component sent it?
     // ie: DamageHandler { getAttackDamage(defender:DefenderInterface)}
-    attackerComponent: Atomic.JSComponent;
+    attackerComponent: Attacker;
 }
+
 export const HitEvent = CustomEventFactory.buildEvent<HitEvent>("Hit");
 export const HitEventData = CustomEventFactory.buildEventData<HitEvent>("Hit");
 

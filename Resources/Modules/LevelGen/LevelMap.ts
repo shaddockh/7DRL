@@ -54,9 +54,9 @@ export class LevelMap extends Grid<MapCell> {
         }
     }
 
-    getCell(x: number, y: number);
-    getCell(pos: Position2d);
-    getCell(xOrPos: any, y?: number) {
+    getCell(x: number, y: number): MapCell;
+    getCell(pos: Position2d): MapCell;
+    getCell(xOrPos: any, y?: number): MapCell {
         if (typeof (xOrPos) != "number") {
             return super.getCell(xOrPos[0], xOrPos[1]);
         } else {
@@ -86,8 +86,8 @@ export class LevelMap extends Grid<MapCell> {
      * Build up an index of interesting things to be able to quickly retreive on the level such as walkable tiles, etc.
      */
     buildIndex() {
-        //if (!this.indexed) {
-        //TODO: Optimize!!
+        // if (!this.indexed) {
+        // TODO: Optimize!!
 
         let walkables: IndexedMapCell[] = [];
         this.iterate((x, y, cell) => {
@@ -108,7 +108,7 @@ export class LevelMap extends Grid<MapCell> {
 
         this.walkables = walkables;
         this.indexed = true;
-        //}
+        // }
     }
 
     /**
