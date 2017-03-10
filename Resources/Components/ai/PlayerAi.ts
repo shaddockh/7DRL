@@ -1,3 +1,9 @@
+import {
+    LogMessageEventData,
+    MoveEntityBlockedEvent,
+    PlayerAttributeChangedEventData,
+    SkipTurnEvent
+} from "Modules/CustomEvents";
 import CustomJSComponent from "Modules/CustomJSComponent";
 import { LevelMap } from "Modules/LevelGen/LevelMap";
 import * as ROT from "rot";
@@ -25,6 +31,8 @@ import {
 import Entity from "Components/Entity";
 import { Attacker } from "Game";
 import Attack from "Components/Attack";
+import Health from "Components/Health";
+import Common from "Components/Common";
 "atomic component";
 
 export default class PlayerAi extends CustomJSComponent implements Attacker {
@@ -34,7 +42,11 @@ export default class PlayerAi extends CustomJSComponent implements Attacker {
      */
     inspectorFields = {
         debug: true,
+        attackComponentName: "Attack"
     };
+
+    /** name of the component that contains the attack logic */
+    attackComponentName = "Attack";
 
     start() {
         // only care about move complete events from ourselves
@@ -51,11 +63,26 @@ export default class PlayerAi extends CustomJSComponent implements Attacker {
         // called when we have been hit by something
         this.subscribeToEvent(this.node, HitEvent(this.onHit.bind(this)));
 
+        this.subscribeToEvent(this.node, MoveEntityBlockedEvent((data) => {
+            this.sendEvent(LogMessageEventData({ message: "Blocked." }));
+        }));
+
         this.sendEvent(RegisterActorAiEventData({ ai: this }));
+
+        // TODO: This is a global event.  Need to actually make this listen at the node level
+        this.subscribeToEvent(SkipTurnEvent(this.onSkipTurn.bind(this)));
 
         // called when we are moving to a new level
         this.subscribeToEvent(RegisterLevelActorsEvent(() => {
             this.sendEvent(RegisterActorAiEventData({ ai: this }));
+        }));
+
+        // TODO: make this message based 
+        this.node.scene.getMainCamera().node.worldPosition = this.node.worldPosition;
+
+        this.sendEvent(PlayerAttributeChangedEventData({
+            name: "life",
+            value: this.node.getJSComponent<Health>("Health").life
         }));
     }
 
@@ -78,7 +105,9 @@ export default class PlayerAi extends CustomJSComponent implements Attacker {
     onMoveComplete() {
         this.DEBUG("OnMoveComplete");
         this.node.sendEvent(TurnTakenEventData());
-        // gameState.getCurrentLevel().setCameraTarget(this.node);
+
+        // TODO: move this to a message to the camera
+        this.node.scene.getMainCamera().node.worldPosition = this.node.worldPosition;
     }
 
     onTurnTaken() {
@@ -91,6 +120,11 @@ export default class PlayerAi extends CustomJSComponent implements Attacker {
         */
 
         this.node.sendEvent(ActionCompleteEventData());
+    }
+
+    onSkipTurn() {
+        this.sendEvent(LogMessageEventData({ message: "Waiting..." }));
+        this.onTurnTaken();
     }
 
     /**
@@ -131,7 +165,9 @@ export default class PlayerAi extends CustomJSComponent implements Attacker {
             attackerComponent: this
         }));
         this.node.sendEvent(MoveEntityCompleteEventData());
+        this.sendEvent(LogMessageEventData({ message: `Attack ${this.getEntityName(data.targetComponent)}.` }));
     }
+
 
     /**
      * Called when we have been attacked by something
@@ -139,17 +175,23 @@ export default class PlayerAi extends CustomJSComponent implements Attacker {
      */
     onHit(data: HitEvent) {
         this.DEBUG("Got hit by something");
+        this.sendEvent(LogMessageEventData({ message: "I was attacked by something." }));
         // calculate damage and then send the damage event
         this.node.sendEvent(DamageEntityEventData({
             value: data.attackerComponent.calculateAttackValue()
+        }));
+
+        this.sendEvent(PlayerAttributeChangedEventData({
+            name: "life",
+            value: this.node.getJSComponent<Health>("Health").life
         }));
     }
 
     /* Attacker Interface */
     calculateAttackValue(): number {
-        const attack = this.node.getJSComponent<Attack>("Attack");
+        const attack = this.node.getJSComponent<Attack>(this.attackComponentName);
         if (Attack) {
-            return this.node.getJSComponent<Attack>("Attack").attackValue;
+            return attack.attackValue;
         }
 
         throw new Error("No attack component defined!");

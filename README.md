@@ -63,3 +63,14 @@ __Ideas__
 - work on attack system to callback to the attacker to determine how much damage should be applied
 - tuning the rendering of entities at different offsets within the grid cell
 - added ability to generate multiple levels.  As the player moves through them, the player is persisted between the levels, but everything else is destroyed
+
+### Day 6 - March 9, 2017
+- added basic ui elements that show message log, player life, and current depth
+- randomized # of monsters per level
+- zoomed in the level and have camera follow player
+- left to do:
+  - have monsters actually chase and attack player
+  - handle player death
+  - implement the key to unlock the door to the next level
+  - have the hearts increase health
+  

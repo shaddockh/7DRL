@@ -4,8 +4,11 @@ import { TerrainType } from "Game";
 
 export default class LevelGenerator {
 
-    constructor(private width: number, private height: number, private debug = false) {
+    constructor(private width: number, private height: number, private depth, private debug = false) {
     }
+
+    enemyCount = [3, 10];
+    heartCount = [0, 2];
 
     generateLevel(): LevelMap {
         this.DEBUG(`Generating level: ${this.width},${this.height}`);
@@ -86,12 +89,35 @@ export default class LevelGenerator {
             attackable: false
         });
 
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0, iEnd = ROT.RNG.getUniformInt(this.enemyCount[0], this.enemyCount[1]); i < iEnd; i++) {
             emptyFloor = level.findEmptyFloorCell();
             this.DEBUG(`Placing beetle at ${emptyFloor.x},${emptyFloor.y}`);
             level.addEntity({
                 gridPosition: [emptyFloor.x, emptyFloor.y],
                 blueprint: "entity_beetle",
+                blocksPath: true,
+                bumpable: true,
+                entityComponent: null,
+                attackable: false
+            });
+        }
+
+        emptyFloor = level.findEmptyFloorCell();
+        level.addEntity({
+            gridPosition: [emptyFloor.x, emptyFloor.y],
+            blueprint: "entity_key",
+            blocksPath: true,
+            bumpable: true,
+            entityComponent: null,
+            attackable: false
+        });
+
+        for (let i = 0, iEnd = ROT.RNG.getUniformInt(this.heartCount[0], this.heartCount[1]); i < iEnd; i++) {
+            emptyFloor = level.findEmptyFloorCell();
+            this.DEBUG(`Placing heart at ${emptyFloor.x},${emptyFloor.y}`);
+            level.addEntity({
+                gridPosition: [emptyFloor.x, emptyFloor.y],
+                blueprint: "entity_heart",
                 blocksPath: true,
                 bumpable: true,
                 entityComponent: null,

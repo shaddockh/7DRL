@@ -37,6 +37,18 @@ var CustomJSComponent = (function (_super) {
             }
         }
     };
+    /**
+     * Return the common name of the entity.  If it doesn't exist, return the node name
+     * @param targetComponent
+     */
+    CustomJSComponent.prototype.getEntityName = function (targetComponent) {
+        var common = targetComponent.node.getJSComponent("Common");
+        if (common) {
+            return common.name;
+        }
+        // fallback
+        return targetComponent.node.name;
+    };
     CustomJSComponent.prototype.deferAction = function (callback, eventName) {
         var _this = this;
         if (!this.deferredActionHandler) {

@@ -7,7 +7,7 @@ export default class Health extends CustomJSComponent {
     */
     inspectorFields = {
         debug: false,
-        life: 1
+        life: 1,
     };
 
     life = 1;

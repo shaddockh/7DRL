@@ -1,4 +1,3 @@
-"atomic component";
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
@@ -11,8 +10,10 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+var CustomEvents_1 = require("../../Modules/CustomEvents");
+"atomic component";
 var CustomJSComponent_1 = require("Modules/CustomJSComponent");
-var CustomEvents_1 = require("Modules/CustomEvents");
+var CustomEvents_2 = require("Modules/CustomEvents");
 ;
 var PlayerInputHandler = (function (_super) {
     __extends(PlayerInputHandler, _super);
@@ -36,7 +37,7 @@ var PlayerInputHandler = (function (_super) {
         var _a;
     }
     PlayerInputHandler.prototype.start = function () {
-        this.subscribeToEvent(CustomEvents_1.PlayerActionBeginEvent(this.onPlayerActionBegin.bind(this)));
+        this.subscribeToEvent(CustomEvents_2.PlayerActionBeginEvent(this.onPlayerActionBegin.bind(this)));
     };
     PlayerInputHandler.prototype.getCurrentAction = function () {
         var input = Atomic.input, keymap = this.keymap;
@@ -68,23 +69,27 @@ var PlayerInputHandler = (function (_super) {
                 switch (action) {
                     case 1 /* MoveLeft */:
                         this.DEBUG("Processing Action: move left");
-                        this.sendEvent(CustomEvents_1.MoveEntityByOffsetEventData({ position: [-1, 0] }));
+                        this.sendEvent(CustomEvents_1.LogMessageEventData({ message: "Walk West." }));
+                        this.sendEvent(CustomEvents_2.MoveEntityByOffsetEventData({ position: [-1, 0] }));
                         break;
                     case 2 /* MoveRight */:
                         this.DEBUG("Processing Action: move right");
-                        this.sendEvent(CustomEvents_1.MoveEntityByOffsetEventData({ position: [1, 0] }));
+                        this.sendEvent(CustomEvents_1.LogMessageEventData({ message: "Walk East." }));
+                        this.sendEvent(CustomEvents_2.MoveEntityByOffsetEventData({ position: [1, 0] }));
                         break;
                     case 3 /* MoveUp */:
                         this.DEBUG("Processing Action: move up");
-                        this.sendEvent(CustomEvents_1.MoveEntityByOffsetEventData({ position: [0, 1] }));
+                        this.sendEvent(CustomEvents_1.LogMessageEventData({ message: "Walk North." }));
+                        this.sendEvent(CustomEvents_2.MoveEntityByOffsetEventData({ position: [0, 1] }));
                         break;
                     case 4 /* MoveDown */:
                         this.DEBUG("Processing Action: move down");
-                        this.sendEvent(CustomEvents_1.MoveEntityByOffsetEventData({ position: [0, -1] }));
+                        this.sendEvent(CustomEvents_1.LogMessageEventData({ message: "Walk South." }));
+                        this.sendEvent(CustomEvents_2.MoveEntityByOffsetEventData({ position: [0, -1] }));
                         break;
                     case 5 /* SkipTurn */:
                         this.DEBUG("Processing Action: skip turn");
-                        this.sendEvent(CustomEvents_1.SkipTurnEventData());
+                        this.sendEvent(CustomEvents_2.SkipTurnEventData());
                         break;
                     // case PlayerActions.DUMP_METRICS:
                     //     this.DEBUG('Processing Action: dump metrics');

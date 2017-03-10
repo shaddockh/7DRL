@@ -11,6 +11,7 @@ import EntityRenderOptions from "Components/EntityRenderOptions";
 import { DeregisterActorAiEventData } from "Modules/CustomEvents";
 import { Actionable } from "rot";
 import BasicMonsterAi from "Components/ai/BasicMonsterAi";
+import Door from "Components/Door";
 "atomic component";
 
 

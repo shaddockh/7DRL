@@ -16,10 +16,11 @@ var so = new Atomic.ScriptObject();
 so.subscribeToEvent(Atomic.UpdateEvent(ready));
 function ready() {
     so.unsubscribeFromAllEvents();
-    var generator = new LevelGenerator_1.default(20, 20, true);
+    var generator = new LevelGenerator_1.default(30, 30, true);
     var level = generator.generateLevel();
     so.sendEvent(CustomEvents.LoadLevelEventData({
-        level: level
+        level: level,
+        depth: 1
     }));
 }
 //# sourceMappingURL=main.js.map

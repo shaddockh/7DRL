@@ -1,3 +1,5 @@
+import { HeartInspectorFields } from "../../Components/Heart";
+import { CommonInspectorFields } from "../../Components/Common";
 import { EntityData } from "Game";
 import { AttackInspectorFields } from "../../Components/Attack";
 import { BasicMonsterAiProps } from "../../Components/ai/BasicMonsterAi";
@@ -6,6 +8,9 @@ import { DoorInspectorFields } from "Components/Door";
 export const entity_base = {
     prefabDir: "Prefabs/autogen/entities",
     isPrefab: true,
+    Common: <CommonInspectorFields>{
+        name: "entity base"
+    },
     StaticSprite2D: {
         sprite: "Sprites/PlanetCute/CharacterBoy.png",
         blendMode: Atomic.BlendMode.BLEND_ALPHA
@@ -20,6 +25,9 @@ export const entity_base = {
 
 export const entity_exit_door = {
     inherits: "entity_base",
+    Common: <CommonInspectorFields>{
+        name: "Door"
+    },
     StaticSprite2D: {
         sprite: "Sprites/PlanetCute/DoorTallClosed.png"
     },
@@ -47,6 +55,9 @@ export const entity_actor = {
 
 export const entity_player = {
     inherits: "entity_actor",
+    Common: <CommonInspectorFields>{
+        name: "Player"
+    },
     StaticSprite2D: {
         sprite: "Sprites/PlanetCute/CharacterBoy.png"
     },
@@ -67,6 +78,9 @@ export const entity_player = {
 
 export const entity_beetle = {
     inherits: "entity_actor",
+    Common: <CommonInspectorFields>{
+        name: "Red Beetle"
+    },
     StaticSprite2D: {
         sprite: "Sprites/PlanetCute/EnemyBug.png"
     },
@@ -84,5 +98,38 @@ export const entity_beetle = {
     },
     Attack: <AttackInspectorFields>{
         attackValue: 1
+    }
+};
+
+export const entity_heart = {
+    inherits: "entity_base",
+    Common: <CommonInspectorFields>{
+        name: "Heart"
+    },
+    StaticSprite2D: {
+        sprite: "Sprites/PlanetCute/Heart.png"
+    },
+    Heart: <HeartInspectorFields>{
+        value: 3
+    },
+    Entity: {
+        bumpable: true,
+        attackable: false,
+        blocksPath: true
+    }
+};
+
+export const entity_key = {
+    inherits: "entity_base",
+    Common: <CommonInspectorFields>{
+        name: "Key"
+    },
+    StaticSprite2D: {
+        sprite: "Sprites/PlanetCute/Key.png"
+    },
+    Entity: {
+        bumpable: true,
+        attackable: false,
+        blocksPath: true
     }
 };

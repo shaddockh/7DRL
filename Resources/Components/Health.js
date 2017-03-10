@@ -22,7 +22,7 @@ var Health = (function (_super) {
         */
         _this.inspectorFields = {
             debug: false,
-            life: 1
+            life: 1,
         };
         _this.life = 1;
         return _this;

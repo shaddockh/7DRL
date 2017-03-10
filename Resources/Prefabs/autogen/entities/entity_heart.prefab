@@ -1,31 +1,40 @@
 <?xml version="1.0"?>
-<node id="2">
+<node id="7">
 	<attribute name="Is Enabled" value="true" />
-	<attribute name="Name" value="entity_base" />
+	<attribute name="Name" value="entity_heart" />
 	<attribute name="Tags" />
 	<attribute name="Position" value="0 0 0" />
 	<attribute name="Rotation" value="1 0 0 0" />
 	<attribute name="Scale" value="1 1 1" />
 	<attribute name="Variables" />
-	<component type="JSComponent" id="16777216">
+	<component type="JSComponent" id="16777241">
 		<attribute name="ComponentFile" value="JSComponentFile;Components/Common.js" />
 		<attribute name="FieldValues">
-			<variant name="name" type="String" value="entity base" />
+			<variant name="name" type="String" value="Heart" />
 		</attribute>
 	</component>
-	<component type="StaticSprite2D" id="1">
-		<attribute name="Sprite" value="Sprite2D;Sprites/PlanetCute/CharacterBoy.png" />
+	<component type="StaticSprite2D" id="7">
+		<attribute name="Sprite" value="Sprite2D;Sprites/PlanetCute/Heart.png" />
 	</component>
-	<component type="JSComponent" id="16777217">
+	<component type="JSComponent" id="16777242">
 		<attribute name="ComponentFile" value="JSComponentFile;Components/Entity.js" />
 		<attribute name="FieldValues">
 			<variant name="debug" type="Bool" value="true" />
+			<variant name="bumpable" type="Bool" value="true" />
+			<variant name="attackable" type="Bool" value="false" />
+			<variant name="blocksPath" type="Bool" value="true" />
 		</attribute>
 	</component>
-	<component type="JSComponent" id="16777218">
+	<component type="JSComponent" id="16777243">
 		<attribute name="ComponentFile" value="JSComponentFile;Components/EntityRenderOptions.js" />
 		<attribute name="FieldValues">
 			<variant name="yOffset" type="Float" value="40" />
+		</attribute>
+	</component>
+	<component type="JSComponent" id="16777244">
+		<attribute name="ComponentFile" value="JSComponentFile;Components/Heart.js" />
+		<attribute name="FieldValues">
+			<variant name="value" type="Float" value="3" />
 		</attribute>
 	</component>
 </node>

@@ -89,7 +89,6 @@ var GridMover = (function (_super) {
                 // Queue up an action to notify the player that the move is blocked
                 // this.queuePostMoveAction(() => {
                 this.DEBUG("Blocked by terrain");
-                this.sendEvent(CustomEvents.LogMessageEventData({ message: "Blocked." }));
                 this.node.sendEvent(CustomEvents.MoveEntityBlockedEventData({ from: mapPos_1, to: newMapPos_1 }));
                 this.node.sendEvent(CustomEvents.MoveEntityCompleteEventData());
                 // });

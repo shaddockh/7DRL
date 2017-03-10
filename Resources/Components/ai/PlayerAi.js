@@ -10,8 +10,9 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var CustomJSComponent_1 = require("Modules/CustomJSComponent");
 var CustomEvents_1 = require("Modules/CustomEvents");
+var CustomJSComponent_1 = require("Modules/CustomJSComponent");
+var CustomEvents_2 = require("Modules/CustomEvents");
 var Attack_1 = require("Components/Attack");
 "atomic component";
 var PlayerAi = (function (_super) {
@@ -23,31 +24,45 @@ var PlayerAi = (function (_super) {
          */
         _this.inspectorFields = {
             debug: true,
+            attackComponentName: "Attack"
         };
+        /** name of the component that contains the attack logic */
+        _this.attackComponentName = "Attack";
         return _this;
     }
     PlayerAi.prototype.start = function () {
         var _this = this;
         // only care about move complete events from ourselves
-        this.subscribeToEvent(this.node, CustomEvents_1.MoveEntityCompleteEvent(this.onMoveComplete.bind(this)));
-        this.subscribeToEvent(this.node, CustomEvents_1.TurnTakenEvent(this.onTurnTaken.bind(this)));
+        this.subscribeToEvent(this.node, CustomEvents_2.MoveEntityCompleteEvent(this.onMoveComplete.bind(this)));
+        this.subscribeToEvent(this.node, CustomEvents_2.TurnTakenEvent(this.onTurnTaken.bind(this)));
         // this.subscribeToEvent(this.node, PlayerActionCompleteEvent(this.onActionComplete.bind(this)));
         // called when we bump into something
-        this.subscribeToEvent(this.node, CustomEvents_1.BumpEntityEvent(this.onHandleBump.bind(this)));
+        this.subscribeToEvent(this.node, CustomEvents_2.BumpEntityEvent(this.onHandleBump.bind(this)));
         // called when we want to attack something
-        this.subscribeToEvent(this.node, CustomEvents_1.AttackEntityEvent(this.onHandleAttackEntity.bind(this)));
+        this.subscribeToEvent(this.node, CustomEvents_2.AttackEntityEvent(this.onHandleAttackEntity.bind(this)));
         // called when we have been hit by something
-        this.subscribeToEvent(this.node, CustomEvents_1.HitEvent(this.onHit.bind(this)));
-        this.sendEvent(CustomEvents_1.RegisterActorAiEventData({ ai: this }));
+        this.subscribeToEvent(this.node, CustomEvents_2.HitEvent(this.onHit.bind(this)));
+        this.subscribeToEvent(this.node, CustomEvents_1.MoveEntityBlockedEvent(function (data) {
+            _this.sendEvent(CustomEvents_1.LogMessageEventData({ message: "Blocked." }));
+        }));
+        this.sendEvent(CustomEvents_2.RegisterActorAiEventData({ ai: this }));
+        // TODO: This is a global event.  Need to actually make this listen at the node level
+        this.subscribeToEvent(CustomEvents_1.SkipTurnEvent(this.onSkipTurn.bind(this)));
         // called when we are moving to a new level
-        this.subscribeToEvent(CustomEvents_1.RegisterLevelActorsEvent(function () {
-            _this.sendEvent(CustomEvents_1.RegisterActorAiEventData({ ai: _this }));
+        this.subscribeToEvent(CustomEvents_2.RegisterLevelActorsEvent(function () {
+            _this.sendEvent(CustomEvents_2.RegisterActorAiEventData({ ai: _this }));
+        }));
+        // TODO: make this message based 
+        this.node.scene.getMainCamera().node.worldPosition = this.node.worldPosition;
+        this.sendEvent(CustomEvents_1.PlayerAttributeChangedEventData({
+            name: "life",
+            value: this.node.getJSComponent("Health").life
         }));
     };
     PlayerAi.prototype.act = function () {
         var _this = this;
         this.DEBUG("Called Act");
-        this.sendEvent(CustomEvents_1.PlayerActionBeginEventData());
+        this.sendEvent(CustomEvents_2.PlayerActionBeginEventData());
         // we are returning a 'thenable' which tells the scheduler to not move on to the next actor
         // until this actor has completed.  This is overriding the onTurnTaken event on this class with
         // the callback passed to the then method, which means that when this class gets an onTurnTaken
@@ -55,14 +70,15 @@ var PlayerAi = (function (_super) {
         // See: http://ondras.github.io/rot.js/manual/#timing/engine for some more information.
         return {
             then: function (resolve) {
-                _this.deferAction(resolve, CustomEvents_1.ActionCompleteEventType);
+                _this.deferAction(resolve, CustomEvents_2.ActionCompleteEventType);
             }
         };
     };
     PlayerAi.prototype.onMoveComplete = function () {
         this.DEBUG("OnMoveComplete");
-        this.node.sendEvent(CustomEvents_1.TurnTakenEventData());
-        // gameState.getCurrentLevel().setCameraTarget(this.node);
+        this.node.sendEvent(CustomEvents_2.TurnTakenEventData());
+        // TODO: move this to a message to the camera
+        this.node.scene.getMainCamera().node.worldPosition = this.node.worldPosition;
     };
     PlayerAi.prototype.onTurnTaken = function () {
         this.DEBUG("OnTurnTaken");
@@ -72,7 +88,11 @@ var PlayerAi = (function (_super) {
             this.levelController.updateFov(this.getPosition());
         });
         */
-        this.node.sendEvent(CustomEvents_1.ActionCompleteEventData());
+        this.node.sendEvent(CustomEvents_2.ActionCompleteEventData());
+    };
+    PlayerAi.prototype.onSkipTurn = function () {
+        this.sendEvent(CustomEvents_1.LogMessageEventData({ message: "Waiting..." }));
+        this.onTurnTaken();
     };
     /**
      * Called when we bump into something.
@@ -85,18 +105,18 @@ var PlayerAi = (function (_super) {
         if (entityComponent.attackable) {
             this.DEBUG("preparing to attack");
             // here we need to recreate the event object because it will get GCd
-            this.node.sendEvent(CustomEvents_1.AttackEntityEventData({
+            this.node.sendEvent(CustomEvents_2.AttackEntityEventData({
                 senderComponent: this,
                 targetComponent: data.targetComponent
             }));
         }
         else {
             this.DEBUG("Sending bump");
-            data.targetComponent.node.sendEvent(CustomEvents_1.BumpedByEntityEventData({
+            data.targetComponent.node.sendEvent(CustomEvents_2.BumpedByEntityEventData({
                 senderComponent: this,
                 targetComponent: data.targetComponent
             }));
-            this.node.sendEvent(CustomEvents_1.MoveEntityCompleteEventData());
+            this.node.sendEvent(CustomEvents_2.MoveEntityCompleteEventData());
         }
     };
     /**
@@ -107,10 +127,11 @@ var PlayerAi = (function (_super) {
         this.DEBUG("Attack Entity");
         this.DEBUG(data.targetComponent.typeName);
         // figure out damage and send it over
-        data.targetComponent.node.sendEvent(CustomEvents_1.HitEventData({
+        data.targetComponent.node.sendEvent(CustomEvents_2.HitEventData({
             attackerComponent: this
         }));
-        this.node.sendEvent(CustomEvents_1.MoveEntityCompleteEventData());
+        this.node.sendEvent(CustomEvents_2.MoveEntityCompleteEventData());
+        this.sendEvent(CustomEvents_1.LogMessageEventData({ message: "Attack " + this.getEntityName(data.targetComponent) + "." }));
     };
     /**
      * Called when we have been attacked by something
@@ -118,16 +139,21 @@ var PlayerAi = (function (_super) {
      */
     PlayerAi.prototype.onHit = function (data) {
         this.DEBUG("Got hit by something");
+        this.sendEvent(CustomEvents_1.LogMessageEventData({ message: "I was attacked by something." }));
         // calculate damage and then send the damage event
-        this.node.sendEvent(CustomEvents_1.DamageEntityEventData({
+        this.node.sendEvent(CustomEvents_2.DamageEntityEventData({
             value: data.attackerComponent.calculateAttackValue()
+        }));
+        this.sendEvent(CustomEvents_1.PlayerAttributeChangedEventData({
+            name: "life",
+            value: this.node.getJSComponent("Health").life
         }));
     };
     /* Attacker Interface */
     PlayerAi.prototype.calculateAttackValue = function () {
-        var attack = this.node.getJSComponent("Attack");
+        var attack = this.node.getJSComponent(this.attackComponentName);
         if (Attack_1.default) {
-            return this.node.getJSComponent("Attack").attackValue;
+            return attack.attackValue;
         }
         throw new Error("No attack component defined!");
     };

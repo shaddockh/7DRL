@@ -1,3 +1,4 @@
+import { LogMessageEventData } from "../../Modules/CustomEvents";
 import { Position2d } from "Game";
 "atomic component";
 import CustomJSComponent from "Modules/CustomJSComponent";
@@ -70,18 +71,22 @@ export default class PlayerInputHandler extends CustomJSComponent {
                 switch (action) {
                     case PlayerActions.MoveLeft:
                         this.DEBUG("Processing Action: move left");
+                        this.sendEvent(LogMessageEventData({ message: "Walk West." }));
                         this.sendEvent(MoveEntityByOffsetEventData({ position: [-1, 0] }));
                         break;
                     case PlayerActions.MoveRight:
                         this.DEBUG("Processing Action: move right");
+                        this.sendEvent(LogMessageEventData({ message: "Walk East." }));
                         this.sendEvent(MoveEntityByOffsetEventData({ position: [1, 0] }));
                         break;
                     case PlayerActions.MoveUp:
                         this.DEBUG("Processing Action: move up");
+                        this.sendEvent(LogMessageEventData({ message: "Walk North." }));
                         this.sendEvent(MoveEntityByOffsetEventData({ position: [0, 1] }));
                         break;
                     case PlayerActions.MoveDown:
                         this.DEBUG("Processing Action: move down");
+                        this.sendEvent(LogMessageEventData({ message: "Walk South." }));
                         this.sendEvent(MoveEntityByOffsetEventData({ position: [0, -1] }));
                         break;
                     case PlayerActions.SkipTurn:

@@ -19,11 +19,12 @@ so.subscribeToEvent(Atomic.UpdateEvent(ready));
 function ready() {
     so.unsubscribeFromAllEvents();
 
-    const generator = new LevelGenerator(20, 20, true);
+    const generator = new LevelGenerator(30, 30, true);
     const level = generator.generateLevel();
 
     so.sendEvent(CustomEvents.LoadLevelEventData({
-        level: level
+        level: level,
+        depth: 1
     }));
 }
 

@@ -12,6 +12,7 @@ import * as ROT from "rot";
  */
 export interface LoadLevelEvent {
     level: LevelMap;
+    depth: number;
 }
 
 export const LoadLevelEvent = CustomEventFactory.buildEvent<LoadLevelEvent>("LoadLevel");
@@ -53,8 +54,8 @@ export const MoveEntityBlockedEventData = CustomEventFactory.buildEventData<Enti
 export interface LogMessage {
     message: string;
 }
-export const LogMessageEvent = CustomEventFactory.buildEvent<LogMessage>("LogMessage");
-export const LogMessageEventData = CustomEventFactory.buildEventData<LogMessage>("LogMessage");
+export const LogMessageEvent = CustomEventFactory.buildEvent<LogMessage>("LogGameMessage");
+export const LogMessageEventData = CustomEventFactory.buildEventData<LogMessage>("LogGameMessage");
 
 export interface ComponentNotificationEvent {
     senderComponent: Atomic.JSComponent;
@@ -115,3 +116,10 @@ export const ActionCompleteEventData = CustomEventFactory.buildNotifyEventData(A
 
 export const TurnTakenEvent = CustomEventFactory.buildNotifyEvent("TurnTaken");
 export const TurnTakenEventData = CustomEventFactory.buildNotifyEventData("TurnTaken");
+
+export interface PlayerAttributeChangedEvent {
+    name: string;
+    value: number;
+}
+export const PlayerAttributeChangedEvent = CustomEventFactory.buildEvent<PlayerAttributeChangedEvent>("PlayerAttributeChanged");
+export const PlayerAttributeChangedEventData = CustomEventFactory.buildEventData<PlayerAttributeChangedEvent>("PlayerAttributeChanged");

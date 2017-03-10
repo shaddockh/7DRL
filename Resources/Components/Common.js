@@ -10,25 +10,23 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var CustomEvents_1 = require("Modules/CustomEvents");
 var CustomJSComponent_1 = require("Modules/CustomJSComponent");
 "atomic component";
-var LogListener = (function (_super) {
-    __extends(LogListener, _super);
-    function LogListener() {
+var Common = (function (_super) {
+    __extends(Common, _super);
+    function Common() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
+        /**
+        * Fields witihin the inspectorFields object will be exposed to the editor
+        */
         _this.inspectorFields = {
-            debug: false
+            debug: false,
+            name: "entity"
         };
+        _this.name = "unknown";
         return _this;
     }
-    LogListener.prototype.start = function () {
-        this.subscribeToEvent(CustomEvents_1.LogMessageEvent(this.logMessage.bind(this)));
-    };
-    LogListener.prototype.logMessage = function (data) {
-        this.DEBUG(data.message);
-    };
-    return LogListener;
+    return Common;
 }(CustomJSComponent_1.default));
-exports.default = LogListener;
-//# sourceMappingURL=LogListener.js.map
+exports.default = Common;
+//# sourceMappingURL=Common.js.map

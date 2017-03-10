@@ -97,7 +97,6 @@ export default class GridMover extends CustomJSComponent {
                 // Queue up an action to notify the player that the move is blocked
                 // this.queuePostMoveAction(() => {
                 this.DEBUG("Blocked by terrain");
-                this.sendEvent(CustomEvents.LogMessageEventData({ message: "Blocked." }));
                 this.node.sendEvent(CustomEvents.MoveEntityBlockedEventData({ from: mapPos, to: newMapPos }));
                 this.node.sendEvent(CustomEvents.MoveEntityCompleteEventData());
                 // });

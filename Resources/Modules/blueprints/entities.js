@@ -3,6 +3,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.entity_base = {
     prefabDir: "Prefabs/autogen/entities",
     isPrefab: true,
+    Common: {
+        name: "entity base"
+    },
     StaticSprite2D: {
         sprite: "Sprites/PlanetCute/CharacterBoy.png",
         blendMode: Atomic.BlendMode.BLEND_ALPHA
@@ -16,6 +19,9 @@ exports.entity_base = {
 };
 exports.entity_exit_door = {
     inherits: "entity_base",
+    Common: {
+        name: "Door"
+    },
     StaticSprite2D: {
         sprite: "Sprites/PlanetCute/DoorTallClosed.png"
     },
@@ -40,6 +46,9 @@ exports.entity_actor = {
 };
 exports.entity_player = {
     inherits: "entity_actor",
+    Common: {
+        name: "Player"
+    },
     StaticSprite2D: {
         sprite: "Sprites/PlanetCute/CharacterBoy.png"
     },
@@ -59,6 +68,9 @@ exports.entity_player = {
 };
 exports.entity_beetle = {
     inherits: "entity_actor",
+    Common: {
+        name: "Red Beetle"
+    },
     StaticSprite2D: {
         sprite: "Sprites/PlanetCute/EnemyBug.png"
     },
@@ -76,6 +88,37 @@ exports.entity_beetle = {
     },
     Attack: {
         attackValue: 1
+    }
+};
+exports.entity_heart = {
+    inherits: "entity_base",
+    Common: {
+        name: "Heart"
+    },
+    StaticSprite2D: {
+        sprite: "Sprites/PlanetCute/Heart.png"
+    },
+    Heart: {
+        value: 3
+    },
+    Entity: {
+        bumpable: true,
+        attackable: false,
+        blocksPath: true
+    }
+};
+exports.entity_key = {
+    inherits: "entity_base",
+    Common: {
+        name: "Key"
+    },
+    StaticSprite2D: {
+        sprite: "Sprites/PlanetCute/Key.png"
+    },
+    Entity: {
+        bumpable: true,
+        attackable: false,
+        blocksPath: true
     }
 };
 //# sourceMappingURL=entities.js.map

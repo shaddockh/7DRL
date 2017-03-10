@@ -1,3 +1,4 @@
+import { PlayerAttributeChangedEvent } from "../Modules/CustomEvents";
 import CustomJSComponent from "Modules/CustomJSComponent";
 import { LevelMap } from "Modules/LevelGen/LevelMap";
 import * as ROT from "rot";
@@ -8,7 +9,8 @@ import {
     SceneReadyEventData,
     RenderCurrentLevelEventData,
     RegisterLevelActorsEventData,
-    PlayerActionBeginEventData
+    PlayerActionBeginEventData,
+    PlayerAttributeChangedEventData
 } from "Modules/CustomEvents";
 "atomic component";
 
@@ -19,6 +21,7 @@ export default class LevelController extends CustomJSComponent {
     inspectorFields = {
         debug: true,
     };
+    currentDepth: number;
 
     private scheduler: ROT.Scheduler;
     engine: ROT.Engine;
@@ -45,6 +48,7 @@ export default class LevelController extends CustomJSComponent {
     private loadLevel(eventData: LoadLevelEvent) {
         this.DEBUG("Loading new level");
         this.currentLevel = eventData.level;
+        this.currentDepth = eventData.depth;
         this.sendEvent(RenderCurrentLevelEventData());
 
         if (!this.engine) {
@@ -56,7 +60,10 @@ export default class LevelController extends CustomJSComponent {
             this.scheduler.clear();
         }
 
-
+        this.sendEvent(PlayerAttributeChangedEventData({
+            name: "depth",
+            value: eventData.depth
+        }));
 
         this.sendEvent(RegisterLevelActorsEventData({
             levelController: this

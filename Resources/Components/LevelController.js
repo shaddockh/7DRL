@@ -44,6 +44,7 @@ var LevelController = (function (_super) {
         var _this = this;
         this.DEBUG("Loading new level");
         this.currentLevel = eventData.level;
+        this.currentDepth = eventData.depth;
         this.sendEvent(CustomEvents_1.RenderCurrentLevelEventData());
         if (!this.engine) {
             this.scheduler = new ROT.Scheduler.Simple();
@@ -53,6 +54,10 @@ var LevelController = (function (_super) {
         else {
             this.scheduler.clear();
         }
+        this.sendEvent(CustomEvents_1.PlayerAttributeChangedEventData({
+            name: "depth",
+            value: eventData.depth
+        }));
         this.sendEvent(CustomEvents_1.RegisterLevelActorsEventData({
             levelController: this
         }));

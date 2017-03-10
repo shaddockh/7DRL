@@ -22,7 +22,9 @@ import {
     DamageEntityEventData,
     AttackEntityEvent,
     DamageEntityEvent,
-    HitEvent
+    HitEvent,
+    MoveEntityCompleteEventData,
+    LogMessageEventData
 } from "Modules/CustomEvents";
 import LevelController from "Components/LevelController";
 import { Position2d, Attacker } from "Game";
@@ -43,6 +45,9 @@ export interface BasicMonsterAiProps {
      * The percent chance for this monster to wander
      */
     wanderChance?: number;
+
+    /** The name of the attack component attached to this entity */
+    attackComponentName?: string;
 };
 
 export default class BasicMonsterAi extends CustomJSComponent implements Attacker, Actionable {
@@ -52,12 +57,14 @@ export default class BasicMonsterAi extends CustomJSComponent implements Attacke
     inspectorFields: BasicMonsterAiProps = {
         debug: true,
         wanderChance: 25,
+        attackComponentName: "Attack"
     };
 
     /**
      * Chance 
      */
     wanderChance = 25;
+    attackComponentName = "Attack";
 
     alive = true;
 
@@ -159,12 +166,15 @@ export default class BasicMonsterAi extends CustomJSComponent implements Attacke
         // who did we bump into?
         const entityComponent = data.targetComponent.node.getJSComponent<Entity>("Entity");
         // just attack, don't allow for picking up items or other bump actions
-        if (entityComponent.attackable) {
+        // TODO: hard coding needs to be removed
+        if (entityComponent.attackable && data.targetComponent.node.name != "entity_player") {
             // here we need to recreate the event object because it will get GCd
             this.node.sendEvent(AttackEntityEventData({
                 senderComponent: this,
                 targetComponent: data.targetComponent
             }));
+        } else {
+            this.node.sendEvent(MoveEntityCompleteEventData());
         }
     }
 
@@ -179,6 +189,9 @@ export default class BasicMonsterAi extends CustomJSComponent implements Attacke
         data.targetComponent.node.sendEvent(HitEventData({
             attackerComponent: this
         }));
+
+        this.sendEvent(LogMessageEventData({ message: `${this.getEntityName(data.senderComponent)} attacked player.` }));
+        this.node.sendEvent(MoveEntityCompleteEventData());
     }
 
     /**
@@ -195,9 +208,9 @@ export default class BasicMonsterAi extends CustomJSComponent implements Attacke
 
     /* Attacker Interface */
     calculateAttackValue(): number {
-        const attack = this.node.getJSComponent<Attack>("Attack");
+        const attack = this.node.getJSComponent<Attack>(this.attackComponentName);
         if (Attack) {
-            return this.node.getJSComponent<Attack>("Attack").attackValue;
+            return attack.attackValue;
         }
 
         throw new Error("No attack component defined!");

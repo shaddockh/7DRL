@@ -3,11 +3,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var ROT = require("rot");
 var LevelMap_1 = require("./LevelMap");
 var LevelGenerator = (function () {
-    function LevelGenerator(width, height, debug) {
+    function LevelGenerator(width, height, depth, debug) {
         if (debug === void 0) { debug = false; }
         this.width = width;
         this.height = height;
+        this.depth = depth;
         this.debug = debug;
+        this.enemyCount = [3, 10];
+        this.heartCount = [0, 2];
     }
     LevelGenerator.prototype.generateLevel = function () {
         this.DEBUG("Generating level: " + this.width + "," + this.height);
@@ -77,12 +80,33 @@ var LevelGenerator = (function () {
             entityComponent: null,
             attackable: false
         });
-        for (var i = 0; i < 3; i++) {
+        for (var i = 0, iEnd = ROT.RNG.getUniformInt(this.enemyCount[0], this.enemyCount[1]); i < iEnd; i++) {
             emptyFloor = level.findEmptyFloorCell();
             this.DEBUG("Placing beetle at " + emptyFloor.x + "," + emptyFloor.y);
             level.addEntity({
                 gridPosition: [emptyFloor.x, emptyFloor.y],
                 blueprint: "entity_beetle",
+                blocksPath: true,
+                bumpable: true,
+                entityComponent: null,
+                attackable: false
+            });
+        }
+        emptyFloor = level.findEmptyFloorCell();
+        level.addEntity({
+            gridPosition: [emptyFloor.x, emptyFloor.y],
+            blueprint: "entity_key",
+            blocksPath: true,
+            bumpable: true,
+            entityComponent: null,
+            attackable: false
+        });
+        for (var i = 0, iEnd = ROT.RNG.getUniformInt(this.heartCount[0], this.heartCount[1]); i < iEnd; i++) {
+            emptyFloor = level.findEmptyFloorCell();
+            this.DEBUG("Placing heart at " + emptyFloor.x + "," + emptyFloor.y);
+            level.addEntity({
+                gridPosition: [emptyFloor.x, emptyFloor.y],
+                blueprint: "entity_heart",
                 blocksPath: true,
                 bumpable: true,
                 entityComponent: null,

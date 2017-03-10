@@ -26,11 +26,13 @@ var BasicMonsterAi = (function (_super) {
         _this.inspectorFields = {
             debug: true,
             wanderChance: 25,
+            attackComponentName: "Attack"
         };
         /**
          * Chance
          */
         _this.wanderChance = 25;
+        _this.attackComponentName = "Attack";
         _this.alive = true;
         return _this;
     }
@@ -125,12 +127,16 @@ var BasicMonsterAi = (function (_super) {
         // who did we bump into?
         var entityComponent = data.targetComponent.node.getJSComponent("Entity");
         // just attack, don't allow for picking up items or other bump actions
-        if (entityComponent.attackable) {
+        // TODO: hard coding needs to be removed
+        if (entityComponent.attackable && data.targetComponent.node.name != "entity_player") {
             // here we need to recreate the event object because it will get GCd
             this.node.sendEvent(CustomEvents_2.AttackEntityEventData({
                 senderComponent: this,
                 targetComponent: data.targetComponent
             }));
+        }
+        else {
+            this.node.sendEvent(CustomEvents_2.MoveEntityCompleteEventData());
         }
     };
     /**
@@ -144,6 +150,8 @@ var BasicMonsterAi = (function (_super) {
         data.targetComponent.node.sendEvent(CustomEvents_1.HitEventData({
             attackerComponent: this
         }));
+        this.sendEvent(CustomEvents_2.LogMessageEventData({ message: this.getEntityName(data.senderComponent) + " attacked player." }));
+        this.node.sendEvent(CustomEvents_2.MoveEntityCompleteEventData());
     };
     /**
      * Called when we have been attacked by something
@@ -158,9 +166,9 @@ var BasicMonsterAi = (function (_super) {
     };
     /* Attacker Interface */
     BasicMonsterAi.prototype.calculateAttackValue = function () {
-        var attack = this.node.getJSComponent("Attack");
+        var attack = this.node.getJSComponent(this.attackComponentName);
         if (Attack_1.default) {
-            return this.node.getJSComponent("Attack").attackValue;
+            return attack.attackValue;
         }
         throw new Error("No attack component defined!");
     };
