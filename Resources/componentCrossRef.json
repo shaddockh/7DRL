@@ -1,0 +1,17 @@
+{
+  "BasicMonsterAi": "Components/ai/BasicMonsterAi.js",
+  "PlayerAi": "Components/ai/PlayerAi.js",
+  "Attack": "Components/Attack.js",
+  "Common": "Components/Common.js",
+  "Door": "Components/Door.js",
+  "Entity": "Components/Entity.js",
+  "EntityRenderOptions": "Components/EntityRenderOptions.js",
+  "GridMover": "Components/GridMover.js",
+  "Health": "Components/Health.js",
+  "Heart": "Components/Heart.js",
+  "Key": "Components/Key.js",
+  "LevelController": "Components/LevelController.js",
+  "LevelRenderer": "Components/LevelRenderer.js",
+  "PlayerInputHandler": "Components/ui/PlayerInputHandler.js",
+  "PlayFieldUi": "Components/ui/PlayFieldUi.js"
+}

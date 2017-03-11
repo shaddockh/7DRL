@@ -29,11 +29,11 @@ var Health = (function (_super) {
     }
     Health.prototype.start = function () {
         this.DEBUG("Start");
-        this.subscribeToEvent(this.node, CustomEvents_1.DamageEntityEvent(this.onDamageEntity.bind(this)));
+        this.subscribeToEvent(this.node, CustomEvents_1.AdjustEntityHealthEvent(this.onAdjustEntityHealth.bind(this)));
     };
-    Health.prototype.onDamageEntity = function (data) {
-        this.life = Math.max(0, this.life - data.value);
-        this.DEBUG("onDamageEntity: (damage value: " + data.value + ", new life: " + this.life + ")");
+    Health.prototype.onAdjustEntityHealth = function (data) {
+        this.life = Math.max(0, this.life + data.value);
+        this.DEBUG("onAdjustEntityHealth: (adjust value: " + data.value + ", new life: " + this.life + ")");
         if (this.life == 0) {
             // TODO: should we send an on health changed event?
             // TODO: kill

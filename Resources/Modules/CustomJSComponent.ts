@@ -39,6 +39,7 @@ export default class CustomJSComponent extends Atomic.JSComponent {
         // fallback
         return targetComponent.node.name;
     }
+
     // Need to make this a part of the class so it doesn't get GC'd before the event fires
     private deferredActionHandler: Atomic.ScriptObject = null;
     deferAction(callback: () => void, eventName?: string) {

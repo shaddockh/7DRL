@@ -82,6 +82,7 @@ var AtomicBlueprintlibPlugin = (function () {
         try {
             this.loadBlueprintCatalog();
             blueprintLib.generatePrefabs();
+            ToolCore.assetDatabase.reimportAllAssets();
         }
         finally {
             blueprintLib.reset();

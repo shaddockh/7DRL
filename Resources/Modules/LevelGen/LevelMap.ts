@@ -83,6 +83,25 @@ export class LevelMap extends Grid<MapCell> {
     }
 
     /**
+     * iterate entities that exist around the center point
+     * @param center
+     * @param radius 
+     * @param callback 
+     */
+    iterateEntitiesInRadius(center: Position2d, radius: number, callback: (e: EntityData) => boolean | null) {
+        this.entities.forEach((e, idx) => {
+            if (!e.deleted) {
+                let ePos = e.gridPosition;
+                if (Math.abs(ePos[0] - center[0]) <= radius && Math.abs(ePos[1] - center[1]) <= radius) {
+                    if (callback(e)) {
+                        return;
+                    }
+                }
+            }
+        });
+    }
+
+    /**
      * Build up an index of interesting things to be able to quickly retreive on the level such as walkable tiles, etc.
      */
     buildIndex() {

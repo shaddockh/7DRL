@@ -21,9 +21,11 @@ var Common = (function (_super) {
         */
         _this.inspectorFields = {
             debug: false,
-            name: "entity"
+            name: "entity",
+            isPlayer: false
         };
         _this.name = "unknown";
+        _this.isPlayer = false;
         return _this;
     }
     return Common;

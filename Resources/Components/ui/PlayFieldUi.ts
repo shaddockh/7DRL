@@ -1,7 +1,9 @@
-import { PlayerAttributeChangedEvent } from "../../Modules/CustomEvents";
+import { LoadLevelEvent, MoveEntityEvent, PlayerDiedEvent } from "../../Modules/CustomEvents";
 import {
     LogMessageEvent,
-    LogMessage
+    LogMessage,
+    KeyPickedUpEvent,
+    PlayerAttributeChangedEvent
 } from "Modules/CustomEvents";
 import CustomJSComponent from "Modules/CustomJSComponent";
 "atomic component";
@@ -60,6 +62,56 @@ export default class PlayFieldUI extends CustomJSComponent {
                     depth.text = `Depth: ${data.value * 10}'`;
                     break;
             }
+        }));
+
+        let key = new Atomic.UIImageWidget();
+        this.window.addChild(key);
+        key.setRect([625, 25, 675, 75]);
+        this.subscribeToEvent(KeyPickedUpEvent((data) => {
+            key.setImage("Sprites/PlanetCute/Key.png");
+        }));
+
+        this.subscribeToEvent(LoadLevelEvent((data) => {
+            key.setImage("");
+        }));
+
+
+        let msgWindow = new Atomic.UIMessageWindow(this.view, "id");
+        msgWindow.show("Welcome to the dungeon!", `
+        MOVEMENT:
+        Movement keys are WASD, VI, or Arrow Keys
+
+        WASD:
+              W
+            A   S 
+              D
+
+        VI:
+              K
+            H   L
+              J 
+
+        <SPACE> to skip turn.
+
+        Each level has a locked door.  You must find the key to descend to the next level.  How far can you get?
+        `, Atomic.UI_MESSAGEWINDOW_SETTINGS.UI_MESSAGEWINDOW_SETTINGS_OK, true, 500, 500);
+
+        // this is not getting displayed for some reason...why?
+        this.subscribeToEvent(PlayerDiedEvent(() => {
+            let msgwindow2 = new Atomic.UIMessageWindow(this.view, "death");
+            msgwindow2.show("You died.",
+                "The dungeon has taken you. How fantastic!  Now you can play again.",
+                Atomic.UI_MESSAGEWINDOW_SETTINGS.UI_MESSAGEWINDOW_SETTINGS_OK, true, 200, 200);
+
+            msgWindow.subscribeToEvent(Atomic.UIWidgetEvent((data) => {
+                if (data.type == Atomic.UI_EVENT_TYPE.UI_EVENT_TYPE_CLICK) {
+                    if (data.target.id == "ok") {
+                        Atomic.graphics.close();
+                    } else {
+                        this.DEBUG(data.target.id);
+                    }
+                }
+            }));
         }));
     }
 }

@@ -42,12 +42,16 @@ exports.entity_actor = {
         gridPixelSizeX: 101,
         gridPixelSizeY: 80,
         debug: true
+    },
+    Health: {
+        debug: true
     }
 };
 exports.entity_player = {
     inherits: "entity_actor",
     Common: {
-        name: "Player"
+        name: "Player",
+        isPlayer: true
     },
     StaticSprite2D: {
         sprite: "Sprites/PlanetCute/CharacterBoy.png"
@@ -59,7 +63,6 @@ exports.entity_player = {
     },
     PlayerAi: {},
     Health: {
-        debug: true,
         life: 15
     },
     Attack: {
@@ -83,7 +86,6 @@ exports.entity_beetle = {
         wanderChance: 23
     },
     Health: {
-        debug: true,
         life: 2
     },
     Attack: {
@@ -99,12 +101,13 @@ exports.entity_heart = {
         sprite: "Sprites/PlanetCute/Heart.png"
     },
     Heart: {
-        value: 3
+        value: 3,
+        debug: true
     },
     Entity: {
         bumpable: true,
         attackable: false,
-        blocksPath: true
+        blocksPath: false
     }
 };
 exports.entity_key = {
@@ -112,13 +115,17 @@ exports.entity_key = {
     Common: {
         name: "Key"
     },
+    Key: {
+        keyId: 1,
+        deubug: true
+    },
     StaticSprite2D: {
         sprite: "Sprites/PlanetCute/Key.png"
     },
     Entity: {
         bumpable: true,
         attackable: false,
-        blocksPath: true
+        blocksPath: false
     }
 };
 //# sourceMappingURL=entities.js.map

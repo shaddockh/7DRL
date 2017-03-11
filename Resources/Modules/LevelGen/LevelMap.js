@@ -76,6 +76,24 @@ var LevelMap = (function (_super) {
         });
     };
     /**
+     * iterate entities that exist around the center point
+     * @param center
+     * @param radius
+     * @param callback
+     */
+    LevelMap.prototype.iterateEntitiesInRadius = function (center, radius, callback) {
+        this.entities.forEach(function (e, idx) {
+            if (!e.deleted) {
+                var ePos = e.gridPosition;
+                if (Math.abs(ePos[0] - center[0]) <= radius && Math.abs(ePos[1] - center[1]) <= radius) {
+                    if (callback(e)) {
+                        return;
+                    }
+                }
+            }
+        });
+    };
+    /**
      * Build up an index of interesting things to be able to quickly retreive on the level such as walkable tiles, etc.
      */
     LevelMap.prototype.buildIndex = function () {

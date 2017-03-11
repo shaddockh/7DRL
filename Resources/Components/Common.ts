@@ -3,6 +3,7 @@ import { default as CustomJSComponent, CustomJSComponentInspectorFields } from "
 
 export interface CommonInspectorFields extends CustomJSComponentInspectorFields {
     name?: string;
+    isPlayer?: boolean;
 }
 
 export default class Common extends CustomJSComponent {
@@ -11,8 +12,10 @@ export default class Common extends CustomJSComponent {
     */
     inspectorFields: CommonInspectorFields = {
         debug: false,
-        name: "entity"
+        name: "entity",
+        isPlayer: false
     };
 
     name = "unknown";
+    isPlayer = false;
 }

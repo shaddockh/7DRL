@@ -1,6 +1,8 @@
-import { DamageEntityEventData } from "../Modules/CustomEvents";
-import { ComponentNotificationEvent, BumpedByEntityEvent } from "Modules/CustomEvents";
+import { AdjustEntityHealthEventData, LogMessageEvent } from "../Modules/CustomEvents";
+import { ComponentNotificationEvent, BumpedByEntityEvent, DestroyEntityEventData, PlayerAttributeChangedEventData, LogMessageEventData } from "Modules/CustomEvents";
 import { default as CustomJSComponent, CustomJSComponentInspectorFields } from "Modules/CustomJSComponent";
+import Common from "Components/Common";
+import Health from "Components/Health";
 "atomic component";
 
 export interface HeartInspectorFields extends CustomJSComponentInspectorFields {
@@ -23,16 +25,25 @@ export default class Heart extends CustomJSComponent {
     }
 
     onBump(data: ComponentNotificationEvent) {
-        //TODO: hard coding
-        if (data.senderComponent.node.name == "entity_player") {
-            this.sendEvent(DamageEntityEventData({
-                value: this.value * -1
+        let common = data.senderComponent.node.getJSComponent<Common>("Common");
+        if (common.isPlayer) {
+            this.DEBUG("Consumed heart");
+            data.senderComponent.node.sendEvent(AdjustEntityHealthEventData({
+                value: this.value
             }));
 
-            this.deferAction(() => {
-                Atomic.destroy(this.node);
-            });
-        }
+            const life = data.senderComponent.node.getJSComponent<Health>("Health").life;
+            data.senderComponent.node.sendEvent(PlayerAttributeChangedEventData({
+                name: "life",
+                value: life
+            }));
 
+            this.sendEvent(LogMessageEventData({
+                message: "You feel healthier!"
+            }));
+
+            this.node.sendEvent(DestroyEntityEventData());
+            this.deferAction(() => Atomic.destroy(this.node));
+        }
     }
 }

@@ -19,26 +19,27 @@ import {
     ActionCompleteEventType,
     MoveEntityByOffsetEvent,
     AttackEntityEventData,
-    DamageEntityEventData,
+    AdjustEntityHealthEventData,
     AttackEntityEvent,
-    DamageEntityEvent,
+    AdjustEntityHealthEvent,
     HitEvent,
     MoveEntityCompleteEventData,
     LogMessageEventData
 } from "Modules/CustomEvents";
 import LevelController from "Components/LevelController";
-import { Position2d, Attacker } from "Game";
+import { Position2d, Attacker, EntityData } from "Game";
 import GridMover from "Components/GridMover";
 import { vec2 } from "gl-matrix";
 import Entity from "Components/Entity";
 import Attack from "Components/Attack";
 import { Actionable } from "rot";
+import Common from "Components/Common";
 "atomic component";
 
 /**
  * Basic monster ai
  */
-export interface BasicMonsterAiProps {
+export interface BasicMonsterAiInspectorFields {
     debug?: boolean;
 
     /**
@@ -48,16 +49,20 @@ export interface BasicMonsterAiProps {
 
     /** The name of the attack component attached to this entity */
     attackComponentName?: string;
+
+    /** Look for enemies in this range */
+    sightRadius?: number;
 };
 
 export default class BasicMonsterAi extends CustomJSComponent implements Attacker, Actionable {
     /**
      * Fields witihin the inspectorFields object will be exposed to the editor
      */
-    inspectorFields: BasicMonsterAiProps = {
+    inspectorFields: BasicMonsterAiInspectorFields = {
         debug: true,
         wanderChance: 25,
-        attackComponentName: "Attack"
+        attackComponentName: "Attack",
+        sightRadius: 4
     };
 
     /**
@@ -65,6 +70,7 @@ export default class BasicMonsterAi extends CustomJSComponent implements Attacke
      */
     wanderChance = 25;
     attackComponentName = "Attack";
+    sightRadius = 4;
 
     alive = true;
 
@@ -99,50 +105,99 @@ export default class BasicMonsterAi extends CustomJSComponent implements Attacke
             this.DEBUG("Act");
             let currentLevel = this.node.scene.getJSComponent<LevelController>("LevelController").currentLevel;
 
-            if (this.wanderChance > Math.random() * 100) {
-                // scan around for somewhere to randomly move
-                let emptyFloor = currentLevel.findEmptyFloorCellInRadius(this.gridPosition, 1);
+            const levelController = this.node.scene.getJSComponent<LevelController>("LevelController");
+            let hero: EntityData;
+            levelController.currentLevel.iterateEntitiesInRadius(this.gridPosition, this.sightRadius, (entity) => {
+                const common = entity.entityComponent.node.getJSComponent<Common>("Common");
+                if (common && common.isPlayer) {
+                    hero = entity;
+                    return true;
+                }
+            });
 
-                if (emptyFloor) {
-                    // this.DEBUG("moving to target:");
-                    // this.DEBUG("empty floor");
-                    // this.DEBUG(emptyFloor);
-                    // const floorPos = vec2.fromValues(emptyFloor.x, emptyFloor.y);
-                    const floorPos = [emptyFloor.x, emptyFloor.y];
-                    // this.DEBUG(floorPos);
-                    // this.DEBUG("grid position");
-                    // this.DEBUG(this.gridPosition);
-                    // const targetPos = vec2.sub(vec2.create(), floorPos, this.gridPosition) as Position2d;
-                    // NOT WORKING FOR SOME REASON!!
+            let waitForMove = false;
 
-                    const targetPos = [emptyFloor.x < this.gridPosition[0] ? -1 : 1, emptyFloor.y < this.gridPosition[1] ? -1 : 1] as Position2d;
-                    if (targetPos[0] != 0 && targetPos[1] != 0) {
-                        // choose one so we move in a cardinal direction
-                        if (Math.random() * 100 > 50) {
-                            targetPos[0] = 0;
-                        } else {
-                            targetPos[1] = 0;
-                        }
-                    }
-                    // this.DEBUG("target position");
-                    // this.DEBUG(targetPos);
+            if (hero) {
+                this.DEBUG("Hero nearby, let's hunt");
+                let playerPos = hero.gridPosition;
+                let position = this.gridPosition;
+                const astar = new ROT.Path.AStar(playerPos[0], playerPos[1],
+                    (x, y) => levelController.currentLevel.getCell(x, y).walkable,
+                    { topology: 4 });
+
+                let path = [];
+                astar.compute(position[0], position[1], (x, y) => {
+                    path.push([x, y]);
+                });
+
+                path.shift(); // remove current position
+                if (path.length < this.sightRadius && path.length > 0) {
+                    this.DEBUG(`hunting enemy located ${path.length} steps away.`);
+                    let target = path.shift();
+                    let dir = vec2.sub(vec2.create(), target, position);
+                    vec2.normalize(dir, dir);
 
                     // Let's defer the movement to the next update so we have time
                     // to wire up the resolve.
                     this.deferAction(() => {
                         this.node.sendEvent(MoveEntityByOffsetEventData({
-                            position: targetPos
+                            position: [dir[0], dir[1]]
                         }));
                     });
-
-                } else {
-                    this.DEBUG("Couldn't find an empty floor");
+                    waitForMove = true;
                 }
-                // we are returning a 'thenable' which tells the scheduler to not move on to the next actor
-                // until this actor has completed.  This is overriding the onTurnTaken event on this class with
-                // the callback passed to the then method, which means that when this class gets an onTurnTaken
-                // event, it will resolve the then.
-                // See: http://ondras.github.io/rot.js/manual/#timing/engine for some more information.
+            } else {
+                this.DEBUG("No hero nearby, let's wander");
+                if (this.wanderChance > Math.random() * 100) {
+                    // scan around for somewhere to randomly move
+                    let emptyFloor = currentLevel.findEmptyFloorCellInRadius(this.gridPosition, 1);
+
+                    if (emptyFloor) {
+                        // this.DEBUG("moving to target:");
+                        // this.DEBUG("empty floor");
+                        // this.DEBUG(emptyFloor);
+                        // const floorPos = vec2.fromValues(emptyFloor.x, emptyFloor.y);
+                        const floorPos = [emptyFloor.x, emptyFloor.y];
+                        // this.DEBUG(floorPos);
+                        // this.DEBUG("grid position");
+                        // this.DEBUG(this.gridPosition);
+                        // const targetPos = vec2.sub(vec2.create(), floorPos, this.gridPosition) as Position2d;
+                        // NOT WORKING FOR SOME REASON!!
+
+                        const targetPos = [emptyFloor.x < this.gridPosition[0] ? -1 : 1, emptyFloor.y < this.gridPosition[1] ? -1 : 1] as Position2d;
+                        if (targetPos[0] != 0 && targetPos[1] != 0) {
+                            // choose one so we move in a cardinal direction
+                            if (Math.random() * 100 > 50) {
+                                targetPos[0] = 0;
+                            } else {
+                                targetPos[1] = 0;
+                            }
+                        }
+                        // this.DEBUG("target position");
+                        // this.DEBUG(targetPos);
+
+                        // Let's defer the movement to the next update so we have time
+                        // to wire up the resolve.
+                        this.deferAction(() => {
+                            this.node.sendEvent(MoveEntityByOffsetEventData({
+                                position: targetPos
+                            }));
+                        });
+
+                    } else {
+                        this.DEBUG("Couldn't find an empty floor");
+                    }
+
+                    waitForMove = true;
+                }
+            }
+
+            // we are returning a 'thenable' which tells the scheduler to not move on to the next actor
+            // until this actor has completed.  This is overriding the onTurnTaken event on this class with
+            // the callback passed to the then method, which means that when this class gets an onTurnTaken
+            // event, it will resolve the then.
+            // See: http://ondras.github.io/rot.js/manual/#timing/engine for some more information.
+            if (waitForMove) {
                 return {
                     then: (resolve) => {
                         this.deferAction(resolve, ActionCompleteEventType);
@@ -166,8 +221,8 @@ export default class BasicMonsterAi extends CustomJSComponent implements Attacke
         // who did we bump into?
         const entityComponent = data.targetComponent.node.getJSComponent<Entity>("Entity");
         // just attack, don't allow for picking up items or other bump actions
-        // TODO: hard coding needs to be removed
-        if (entityComponent.attackable && data.targetComponent.node.name != "entity_player") {
+        const common = data.targetComponent.node.getJSComponent<Common>("Common");
+        if (entityComponent.attackable && common && common.isPlayer) {
             // here we need to recreate the event object because it will get GCd
             this.node.sendEvent(AttackEntityEventData({
                 senderComponent: this,
@@ -184,13 +239,12 @@ export default class BasicMonsterAi extends CustomJSComponent implements Attacke
      */
     onHandleAttackEntity(data: ComponentNotificationEvent) {
         this.DEBUG("Attack Entity");
-        this.DEBUG(data.targetComponent.typeName);
         // figure out damage and send it over
         data.targetComponent.node.sendEvent(HitEventData({
             attackerComponent: this
         }));
 
-        this.sendEvent(LogMessageEventData({ message: `${this.getEntityName(data.senderComponent)} attacked player.` }));
+        this.sendEvent(LogMessageEventData({ message: `${this.getEntityName(data.senderComponent)} attacked you.` }));
         this.node.sendEvent(MoveEntityCompleteEventData());
     }
 
@@ -201,8 +255,8 @@ export default class BasicMonsterAi extends CustomJSComponent implements Attacke
     onHit(data: HitEvent) {
         this.DEBUG("Got hit by something");
         // calculate damage and then send the damage event
-        this.node.sendEvent(DamageEntityEventData({
-            value: data.attackerComponent.calculateAttackValue()
+        this.node.sendEvent(AdjustEntityHealthEventData({
+            value: data.attackerComponent.calculateAttackValue() * -1
         }));
     }
 
@@ -214,20 +268,6 @@ export default class BasicMonsterAi extends CustomJSComponent implements Attacke
         }
 
         throw new Error("No attack component defined!");
-    }
-
-    onActionComplete() {
-        this.DEBUG("OnActionComplete");
-        // call the callback, notifying the scheduler that we are done, but
-        // wait until all pending activities have finished
-        /*
-        if (this.resolveTurn) {
-            setImmediate(() => {
-                this.DEBUG("End of turn.");
-                this.resolveTurn();
-            });
-        }
-        */
     }
 
     onDestroy() {

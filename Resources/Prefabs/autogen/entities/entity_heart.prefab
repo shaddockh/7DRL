@@ -7,7 +7,7 @@
 	<attribute name="Rotation" value="1 0 0 0" />
 	<attribute name="Scale" value="1 1 1" />
 	<attribute name="Variables" />
-	<component type="JSComponent" id="16777241">
+	<component type="JSComponent" id="16777242">
 		<attribute name="ComponentFile" value="JSComponentFile;Components/Common.js" />
 		<attribute name="FieldValues">
 			<variant name="name" type="String" value="Heart" />
@@ -16,25 +16,26 @@
 	<component type="StaticSprite2D" id="7">
 		<attribute name="Sprite" value="Sprite2D;Sprites/PlanetCute/Heart.png" />
 	</component>
-	<component type="JSComponent" id="16777242">
+	<component type="JSComponent" id="16777243">
 		<attribute name="ComponentFile" value="JSComponentFile;Components/Entity.js" />
 		<attribute name="FieldValues">
 			<variant name="debug" type="Bool" value="true" />
 			<variant name="bumpable" type="Bool" value="true" />
 			<variant name="attackable" type="Bool" value="false" />
-			<variant name="blocksPath" type="Bool" value="true" />
+			<variant name="blocksPath" type="Bool" value="false" />
 		</attribute>
 	</component>
-	<component type="JSComponent" id="16777243">
+	<component type="JSComponent" id="16777244">
 		<attribute name="ComponentFile" value="JSComponentFile;Components/EntityRenderOptions.js" />
 		<attribute name="FieldValues">
 			<variant name="yOffset" type="Float" value="40" />
 		</attribute>
 	</component>
-	<component type="JSComponent" id="16777244">
+	<component type="JSComponent" id="16777245">
 		<attribute name="ComponentFile" value="JSComponentFile;Components/Heart.js" />
 		<attribute name="FieldValues">
 			<variant name="value" type="Float" value="3" />
+			<variant name="debug" type="Bool" value="true" />
 		</attribute>
 	</component>
 </node>

@@ -73,12 +73,12 @@ export const BumpedByEntityEventData = CustomEventFactory.buildEventData<Compone
 export const DestroyEntityEvent = CustomEventFactory.buildNotifyEvent("DestroyEntity");
 export const DestroyEntityEventData = CustomEventFactory.buildNotifyEventData("DestroyEntity");
 
-export interface DamageEntityEvent {
+export interface AdjustEntityHealthEvent {
     value: number;
 }
 
-export const DamageEntityEvent = CustomEventFactory.buildEvent<DamageEntityEvent>("DamageEntity");
-export const DamageEntityEventData = CustomEventFactory.buildEventData<DamageEntityEvent>("DamageEntity");
+export const AdjustEntityHealthEvent = CustomEventFactory.buildEvent<AdjustEntityHealthEvent>("AdjustEntityHealth");
+export const AdjustEntityHealthEventData = CustomEventFactory.buildEventData<AdjustEntityHealthEvent>("AdjustEntityHealth");
 
 export interface HitEvent {
     // TODO: maybe pass a common interface for calling back to get damage so we don't care what component sent it?
@@ -88,6 +88,12 @@ export interface HitEvent {
 
 export const HitEvent = CustomEventFactory.buildEvent<HitEvent>("Hit");
 export const HitEventData = CustomEventFactory.buildEventData<HitEvent>("Hit");
+
+export interface KeyPickedUpEvent {
+    keyId: number;
+}
+export const KeyPickedUpEvent = CustomEventFactory.buildEvent<KeyPickedUpEvent>("KeyPickedUp");
+export const KeyPickedUpEventData = CustomEventFactory.buildEventData<KeyPickedUpEvent>("KeyPickedUp");
 
 export const SkipTurnEvent = CustomEventFactory.buildNotifyEvent("SkipTurn");
 export const SkipTurnEventData = CustomEventFactory.buildNotifyEventData("SkipTurn");
@@ -113,6 +119,9 @@ export const PlayerActionBeginEventData = CustomEventFactory.buildNotifyEventDat
 export const ActionCompleteEventType = "ActionComplete";
 export const ActionCompleteEvent = CustomEventFactory.buildNotifyEvent(ActionCompleteEventType);
 export const ActionCompleteEventData = CustomEventFactory.buildNotifyEventData(ActionCompleteEventType);
+
+export const PlayerDiedEvent = CustomEventFactory.buildNotifyEvent("PlayerDied");
+export const PlayerDiedEventData = CustomEventFactory.buildNotifyEventData("PlayerDied");
 
 export const TurnTakenEvent = CustomEventFactory.buildNotifyEvent("TurnTaken");
 export const TurnTakenEventData = CustomEventFactory.buildNotifyEventData("TurnTaken");

@@ -14,44 +14,35 @@ var CustomEvents_1 = require("../Modules/CustomEvents");
 var CustomEvents_2 = require("Modules/CustomEvents");
 var CustomJSComponent_1 = require("Modules/CustomJSComponent");
 "atomic component";
-var Heart = (function (_super) {
-    __extends(Heart, _super);
-    function Heart() {
+var Key = (function (_super) {
+    __extends(Key, _super);
+    function Key() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         /**
         * Fields witihin the inspectorFields object will be exposed to the editor
         */
         _this.inspectorFields = {
             debug: false,
-            value: 2
+            keyId: 1
         };
-        _this.value = 2;
+        _this.keyId = 1;
         return _this;
     }
-    Heart.prototype.start = function () {
-        this.subscribeToEvent(this.node, CustomEvents_2.BumpedByEntityEvent(this.onBump.bind(this)));
+    Key.prototype.start = function () {
+        this.subscribeToEvent(this.node, CustomEvents_2.BumpedByEntityEvent(this.onBumpedByEntity.bind(this)));
     };
-    Heart.prototype.onBump = function (data) {
+    Key.prototype.onBumpedByEntity = function (data) {
         var _this = this;
+        this.DEBUG("Got a bump event");
         var common = data.senderComponent.node.getJSComponent("Common");
         if (common.isPlayer) {
-            this.DEBUG("Consumed heart");
-            data.senderComponent.node.sendEvent(CustomEvents_1.AdjustEntityHealthEventData({
-                value: this.value
-            }));
-            var life = data.senderComponent.node.getJSComponent("Health").life;
-            data.senderComponent.node.sendEvent(CustomEvents_2.PlayerAttributeChangedEventData({
-                name: "life",
-                value: life
-            }));
-            this.sendEvent(CustomEvents_2.LogMessageEventData({
-                message: "You feel healthier!"
-            }));
+            this.node.sendEvent(CustomEvents_1.LogMessageEventData({ message: "You found a key!" }));
+            this.node.sendEvent(CustomEvents_2.KeyPickedUpEventData({ keyId: this.keyId }));
             this.node.sendEvent(CustomEvents_2.DestroyEntityEventData());
             this.deferAction(function () { return Atomic.destroy(_this.node); });
         }
     };
-    return Heart;
+    return Key;
 }(CustomJSComponent_1.default));
-exports.default = Heart;
-//# sourceMappingURL=Heart.js.map
+exports.default = Key;
+//# sourceMappingURL=Key.js.map

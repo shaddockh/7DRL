@@ -2,8 +2,9 @@ import { HeartInspectorFields } from "../../Components/Heart";
 import { CommonInspectorFields } from "../../Components/Common";
 import { EntityData } from "Game";
 import { AttackInspectorFields } from "../../Components/Attack";
-import { BasicMonsterAiProps } from "../../Components/ai/BasicMonsterAi";
+import { BasicMonsterAiInspectorFields } from "../../Components/ai/BasicMonsterAi";
 import { DoorInspectorFields } from "Components/Door";
+import { KeyInspectorFields } from "Components/Key";
 
 export const entity_base = {
     prefabDir: "Prefabs/autogen/entities",
@@ -50,13 +51,17 @@ export const entity_actor = {
         gridPixelSizeX: 101,
         gridPixelSizeY: 80,
         debug: true
+    },
+    Health: {
+        debug: true
     }
 };
 
 export const entity_player = {
     inherits: "entity_actor",
     Common: <CommonInspectorFields>{
-        name: "Player"
+        name: "Player",
+        isPlayer: true
     },
     StaticSprite2D: {
         sprite: "Sprites/PlanetCute/CharacterBoy.png"
@@ -68,7 +73,6 @@ export const entity_player = {
     },
     PlayerAi: {},
     Health: {
-        debug: true,
         life: 15
     },
     Attack: <AttackInspectorFields>{
@@ -91,9 +95,8 @@ export const entity_beetle = {
     },
     BasicMonsterAi: {
         wanderChance: 23
-    } as BasicMonsterAiProps,
+    } as BasicMonsterAiInspectorFields,
     Health: {
-        debug: true,
         life: 2
     },
     Attack: <AttackInspectorFields>{
@@ -110,12 +113,13 @@ export const entity_heart = {
         sprite: "Sprites/PlanetCute/Heart.png"
     },
     Heart: <HeartInspectorFields>{
-        value: 3
+        value: 3,
+        debug: true
     },
     Entity: {
         bumpable: true,
         attackable: false,
-        blocksPath: true
+        blocksPath: false
     }
 };
 
@@ -124,12 +128,16 @@ export const entity_key = {
     Common: <CommonInspectorFields>{
         name: "Key"
     },
+    Key: <KeyInspectorFields>{
+        keyId: 1,
+        deubug: true
+    },
     StaticSprite2D: {
         sprite: "Sprites/PlanetCute/Key.png"
     },
     Entity: {
         bumpable: true,
         attackable: false,
-        blocksPath: true
+        blocksPath: false
     }
 };

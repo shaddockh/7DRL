@@ -10,10 +10,10 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var CustomEvents_1 = require("Modules/CustomEvents");
-var CustomJSComponent_1 = require("Modules/CustomJSComponent");
-var CustomEvents_2 = require("Modules/CustomEvents");
 var Attack_1 = require("Components/Attack");
+var CustomEvents_1 = require("Modules/CustomEvents");
+var CustomEvents_2 = require("Modules/CustomEvents");
+var CustomJSComponent_1 = require("Modules/CustomJSComponent");
 "atomic component";
 var PlayerAi = (function (_super) {
     __extends(PlayerAi, _super);
@@ -24,10 +24,12 @@ var PlayerAi = (function (_super) {
          */
         _this.inspectorFields = {
             debug: true,
-            attackComponentName: "Attack"
+            attackComponentName: "Attack",
+            alive: true
         };
         /** name of the component that contains the attack logic */
         _this.attackComponentName = "Attack";
+        _this.alive = true;
         return _this;
     }
     PlayerAi.prototype.start = function () {
@@ -42,6 +44,8 @@ var PlayerAi = (function (_super) {
         this.subscribeToEvent(this.node, CustomEvents_2.AttackEntityEvent(this.onHandleAttackEntity.bind(this)));
         // called when we have been hit by something
         this.subscribeToEvent(this.node, CustomEvents_2.HitEvent(this.onHit.bind(this)));
+        // called when entity should be destroyed
+        this.subscribeToEvent(this.node, CustomEvents_2.DestroyEntityEvent(this.onDestroy.bind(this)));
         this.subscribeToEvent(this.node, CustomEvents_1.MoveEntityBlockedEvent(function (data) {
             _this.sendEvent(CustomEvents_1.LogMessageEventData({ message: "Blocked." }));
         }));
@@ -62,17 +66,19 @@ var PlayerAi = (function (_super) {
     PlayerAi.prototype.act = function () {
         var _this = this;
         this.DEBUG("Called Act");
-        this.sendEvent(CustomEvents_2.PlayerActionBeginEventData());
-        // we are returning a 'thenable' which tells the scheduler to not move on to the next actor
-        // until this actor has completed.  This is overriding the onTurnTaken event on this class with
-        // the callback passed to the then method, which means that when this class gets an onTurnTaken
-        // event, it will resolve the then.
-        // See: http://ondras.github.io/rot.js/manual/#timing/engine for some more information.
-        return {
-            then: function (resolve) {
-                _this.deferAction(resolve, CustomEvents_2.ActionCompleteEventType);
-            }
-        };
+        if (this.alive) {
+            this.sendEvent(CustomEvents_2.PlayerActionBeginEventData());
+            // we are returning a 'thenable' which tells the scheduler to not move on to the next actor
+            // until this actor has completed.  This is overriding the onTurnTaken event on this class with
+            // the callback passed to the then method, which means that when this class gets an onTurnTaken
+            // event, it will resolve the then.
+            // See: http://ondras.github.io/rot.js/manual/#timing/engine for some more information.
+            return {
+                then: function (resolve) {
+                    _this.deferAction(resolve, CustomEvents_2.ActionCompleteEventType);
+                }
+            };
+        }
     };
     PlayerAi.prototype.onMoveComplete = function () {
         this.DEBUG("OnMoveComplete");
@@ -139,10 +145,9 @@ var PlayerAi = (function (_super) {
      */
     PlayerAi.prototype.onHit = function (data) {
         this.DEBUG("Got hit by something");
-        this.sendEvent(CustomEvents_1.LogMessageEventData({ message: "I was attacked by something." }));
         // calculate damage and then send the damage event
-        this.node.sendEvent(CustomEvents_2.DamageEntityEventData({
-            value: data.attackerComponent.calculateAttackValue()
+        this.node.sendEvent(CustomEvents_2.AdjustEntityHealthEventData({
+            value: data.attackerComponent.calculateAttackValue() * -1
         }));
         this.sendEvent(CustomEvents_1.PlayerAttributeChangedEventData({
             name: "life",
@@ -156,6 +161,15 @@ var PlayerAi = (function (_super) {
             return attack.attackValue;
         }
         throw new Error("No attack component defined!");
+    };
+    PlayerAi.prototype.onDestroy = function () {
+        this.DEBUG("Destroy");
+        this.alive = false;
+        this.node.scale2D = 0; // hide
+        this.sendEvent(CustomEvents_2.PlayerDiedEventData());
+        // this.deferAction(() => {
+        // Atomic.destroy(this.node);
+        // });
     };
     return PlayerAi;
 }(CustomJSComponent_1.default));

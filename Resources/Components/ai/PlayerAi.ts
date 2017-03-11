@@ -1,38 +1,36 @@
+import Attack from "Components/Attack";
+import Common from "Components/Common";
+import Entity from "Components/Entity";
+import Health from "Components/Health";
+import { Attacker } from "Game";
 import {
     LogMessageEventData,
     MoveEntityBlockedEvent,
     PlayerAttributeChangedEventData,
     SkipTurnEvent
 } from "Modules/CustomEvents";
-import CustomJSComponent from "Modules/CustomJSComponent";
-import { LevelMap } from "Modules/LevelGen/LevelMap";
-import * as ROT from "rot";
 import {
-    RegisterActorAiEventData,
-    MoveEntityCompleteEvent,
-    TurnTakenEventData,
-    TurnTakenEvent,
     ActionCompleteEventData,
-    ActionCompleteEvent,
-    PlayerActionBeginEventData,
     ActionCompleteEventType,
-    ComponentNotificationEvent,
-    AttackEntityEventData,
-    DamageEntityEventData,
-    BumpEntityEvent,
+    AdjustEntityHealthEventData,
     AttackEntityEvent,
-    HitEventData,
-    DamageEntityEvent,
-    HitEvent,
+    AttackEntityEventData,
     BumpedByEntityEventData,
+    BumpEntityEvent,
+    ComponentNotificationEvent,
+    DestroyEntityEvent,
+    HitEvent,
+    HitEventData,
+    MoveEntityCompleteEvent,
     MoveEntityCompleteEventData,
-    RegisterLevelActorsEvent
+    PlayerActionBeginEventData,
+    PlayerDiedEventData,
+    RegisterActorAiEventData,
+    RegisterLevelActorsEvent,
+    TurnTakenEvent,
+    TurnTakenEventData
 } from "Modules/CustomEvents";
-import Entity from "Components/Entity";
-import { Attacker } from "Game";
-import Attack from "Components/Attack";
-import Health from "Components/Health";
-import Common from "Components/Common";
+import CustomJSComponent from "Modules/CustomJSComponent";
 "atomic component";
 
 export default class PlayerAi extends CustomJSComponent implements Attacker {
@@ -42,11 +40,13 @@ export default class PlayerAi extends CustomJSComponent implements Attacker {
      */
     inspectorFields = {
         debug: true,
-        attackComponentName: "Attack"
+        attackComponentName: "Attack",
+        alive: true
     };
 
     /** name of the component that contains the attack logic */
     attackComponentName = "Attack";
+    alive = true;
 
     start() {
         // only care about move complete events from ourselves
@@ -62,6 +62,9 @@ export default class PlayerAi extends CustomJSComponent implements Attacker {
 
         // called when we have been hit by something
         this.subscribeToEvent(this.node, HitEvent(this.onHit.bind(this)));
+
+        // called when entity should be destroyed
+        this.subscribeToEvent(this.node, DestroyEntityEvent(this.onDestroy.bind(this)));
 
         this.subscribeToEvent(this.node, MoveEntityBlockedEvent((data) => {
             this.sendEvent(LogMessageEventData({ message: "Blocked." }));
@@ -88,18 +91,20 @@ export default class PlayerAi extends CustomJSComponent implements Attacker {
 
     act() {
         this.DEBUG("Called Act");
-        this.sendEvent(PlayerActionBeginEventData());
+        if (this.alive) {
+            this.sendEvent(PlayerActionBeginEventData());
 
-        // we are returning a 'thenable' which tells the scheduler to not move on to the next actor
-        // until this actor has completed.  This is overriding the onTurnTaken event on this class with
-        // the callback passed to the then method, which means that when this class gets an onTurnTaken
-        // event, it will resolve the then.
-        // See: http://ondras.github.io/rot.js/manual/#timing/engine for some more information.
-        return {
-            then: (resolve) => {
-                this.deferAction(resolve, ActionCompleteEventType);
-            }
-        };
+            // we are returning a 'thenable' which tells the scheduler to not move on to the next actor
+            // until this actor has completed.  This is overriding the onTurnTaken event on this class with
+            // the callback passed to the then method, which means that when this class gets an onTurnTaken
+            // event, it will resolve the then.
+            // See: http://ondras.github.io/rot.js/manual/#timing/engine for some more information.
+            return {
+                then: (resolve) => {
+                    this.deferAction(resolve, ActionCompleteEventType);
+                }
+            };
+        }
     }
 
     onMoveComplete() {
@@ -175,10 +180,9 @@ export default class PlayerAi extends CustomJSComponent implements Attacker {
      */
     onHit(data: HitEvent) {
         this.DEBUG("Got hit by something");
-        this.sendEvent(LogMessageEventData({ message: "I was attacked by something." }));
         // calculate damage and then send the damage event
-        this.node.sendEvent(DamageEntityEventData({
-            value: data.attackerComponent.calculateAttackValue()
+        this.node.sendEvent(AdjustEntityHealthEventData({
+            value: data.attackerComponent.calculateAttackValue() * -1
         }));
 
         this.sendEvent(PlayerAttributeChangedEventData({
@@ -197,4 +201,14 @@ export default class PlayerAi extends CustomJSComponent implements Attacker {
         throw new Error("No attack component defined!");
     }
 
+    onDestroy() {
+        this.DEBUG("Destroy");
+        this.alive = false;
+
+        this.node.scale2D = 0; // hide
+        this.sendEvent(PlayerDiedEventData());
+        // this.deferAction(() => {
+        // Atomic.destroy(this.node);
+        // });
+    }
 }

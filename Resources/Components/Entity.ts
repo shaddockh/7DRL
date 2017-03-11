@@ -42,6 +42,7 @@ export default class Entity extends CustomJSComponent implements EntityData {
     update(timeStep) { }
 
     onDestroy() {
+        this.DEBUG("Got a destroy message");
         this.deleted = true;
     }
 

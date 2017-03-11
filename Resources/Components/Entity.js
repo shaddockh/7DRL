@@ -49,6 +49,7 @@ var Entity = (function (_super) {
     };
     Entity.prototype.update = function (timeStep) { };
     Entity.prototype.onDestroy = function () {
+        this.DEBUG("Got a destroy message");
         this.deleted = true;
     };
     return Entity;

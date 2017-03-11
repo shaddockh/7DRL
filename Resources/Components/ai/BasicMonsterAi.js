@@ -12,7 +12,9 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var CustomEvents_1 = require("../../Modules/CustomEvents");
 var CustomJSComponent_1 = require("Modules/CustomJSComponent");
+var ROT = require("rot");
 var CustomEvents_2 = require("Modules/CustomEvents");
+var gl_matrix_1 = require("gl-matrix");
 var Attack_1 = require("Components/Attack");
 "atomic component";
 ;
@@ -26,13 +28,15 @@ var BasicMonsterAi = (function (_super) {
         _this.inspectorFields = {
             debug: true,
             wanderChance: 25,
-            attackComponentName: "Attack"
+            attackComponentName: "Attack",
+            sightRadius: 4
         };
         /**
          * Chance
          */
         _this.wanderChance = 25;
         _this.attackComponentName = "Attack";
+        _this.sightRadius = 4;
         _this.alive = true;
         return _this;
     }
@@ -64,48 +68,89 @@ var BasicMonsterAi = (function (_super) {
         if (this.alive) {
             this.DEBUG("Act");
             var currentLevel = this.node.scene.getJSComponent("LevelController").currentLevel;
-            if (this.wanderChance > Math.random() * 100) {
-                // scan around for somewhere to randomly move
-                var emptyFloor = currentLevel.findEmptyFloorCellInRadius(this.gridPosition, 1);
-                if (emptyFloor) {
-                    // this.DEBUG("moving to target:");
-                    // this.DEBUG("empty floor");
-                    // this.DEBUG(emptyFloor);
-                    // const floorPos = vec2.fromValues(emptyFloor.x, emptyFloor.y);
-                    var floorPos = [emptyFloor.x, emptyFloor.y];
-                    // this.DEBUG(floorPos);
-                    // this.DEBUG("grid position");
-                    // this.DEBUG(this.gridPosition);
-                    // const targetPos = vec2.sub(vec2.create(), floorPos, this.gridPosition) as Position2d;
-                    // NOT WORKING FOR SOME REASON!!
-                    var targetPos_1 = [emptyFloor.x < this.gridPosition[0] ? -1 : 1, emptyFloor.y < this.gridPosition[1] ? -1 : 1];
-                    if (targetPos_1[0] != 0 && targetPos_1[1] != 0) {
-                        // choose one so we move in a cardinal direction
-                        if (Math.random() * 100 > 50) {
-                            targetPos_1[0] = 0;
-                        }
-                        else {
-                            targetPos_1[1] = 0;
-                        }
-                    }
-                    // this.DEBUG("target position");
-                    // this.DEBUG(targetPos);
+            var levelController_1 = this.node.scene.getJSComponent("LevelController");
+            var hero_1;
+            levelController_1.currentLevel.iterateEntitiesInRadius(this.gridPosition, this.sightRadius, function (entity) {
+                var common = entity.entityComponent.node.getJSComponent("Common");
+                if (common && common.isPlayer) {
+                    hero_1 = entity;
+                    return true;
+                }
+            });
+            var waitForMove = false;
+            if (hero_1) {
+                this.DEBUG("Hero nearby, let's hunt");
+                var playerPos = hero_1.gridPosition;
+                var position = this.gridPosition;
+                var astar = new ROT.Path.AStar(playerPos[0], playerPos[1], function (x, y) { return levelController_1.currentLevel.getCell(x, y).walkable; }, { topology: 4 });
+                var path_1 = [];
+                astar.compute(position[0], position[1], function (x, y) {
+                    path_1.push([x, y]);
+                });
+                path_1.shift(); // remove current position
+                if (path_1.length < this.sightRadius && path_1.length > 0) {
+                    this.DEBUG("hunting enemy located " + path_1.length + " steps away.");
+                    var target = path_1.shift();
+                    var dir_1 = gl_matrix_1.vec2.sub(gl_matrix_1.vec2.create(), target, position);
+                    gl_matrix_1.vec2.normalize(dir_1, dir_1);
                     // Let's defer the movement to the next update so we have time
                     // to wire up the resolve.
                     this.deferAction(function () {
                         _this.node.sendEvent(CustomEvents_2.MoveEntityByOffsetEventData({
-                            position: targetPos_1
+                            position: [dir_1[0], dir_1[1]]
                         }));
                     });
+                    waitForMove = true;
                 }
-                else {
-                    this.DEBUG("Couldn't find an empty floor");
+            }
+            else {
+                this.DEBUG("No hero nearby, let's wander");
+                if (this.wanderChance > Math.random() * 100) {
+                    // scan around for somewhere to randomly move
+                    var emptyFloor = currentLevel.findEmptyFloorCellInRadius(this.gridPosition, 1);
+                    if (emptyFloor) {
+                        // this.DEBUG("moving to target:");
+                        // this.DEBUG("empty floor");
+                        // this.DEBUG(emptyFloor);
+                        // const floorPos = vec2.fromValues(emptyFloor.x, emptyFloor.y);
+                        var floorPos = [emptyFloor.x, emptyFloor.y];
+                        // this.DEBUG(floorPos);
+                        // this.DEBUG("grid position");
+                        // this.DEBUG(this.gridPosition);
+                        // const targetPos = vec2.sub(vec2.create(), floorPos, this.gridPosition) as Position2d;
+                        // NOT WORKING FOR SOME REASON!!
+                        var targetPos_1 = [emptyFloor.x < this.gridPosition[0] ? -1 : 1, emptyFloor.y < this.gridPosition[1] ? -1 : 1];
+                        if (targetPos_1[0] != 0 && targetPos_1[1] != 0) {
+                            // choose one so we move in a cardinal direction
+                            if (Math.random() * 100 > 50) {
+                                targetPos_1[0] = 0;
+                            }
+                            else {
+                                targetPos_1[1] = 0;
+                            }
+                        }
+                        // this.DEBUG("target position");
+                        // this.DEBUG(targetPos);
+                        // Let's defer the movement to the next update so we have time
+                        // to wire up the resolve.
+                        this.deferAction(function () {
+                            _this.node.sendEvent(CustomEvents_2.MoveEntityByOffsetEventData({
+                                position: targetPos_1
+                            }));
+                        });
+                    }
+                    else {
+                        this.DEBUG("Couldn't find an empty floor");
+                    }
+                    waitForMove = true;
                 }
-                // we are returning a 'thenable' which tells the scheduler to not move on to the next actor
-                // until this actor has completed.  This is overriding the onTurnTaken event on this class with
-                // the callback passed to the then method, which means that when this class gets an onTurnTaken
-                // event, it will resolve the then.
-                // See: http://ondras.github.io/rot.js/manual/#timing/engine for some more information.
+            }
+            // we are returning a 'thenable' which tells the scheduler to not move on to the next actor
+            // until this actor has completed.  This is overriding the onTurnTaken event on this class with
+            // the callback passed to the then method, which means that when this class gets an onTurnTaken
+            // event, it will resolve the then.
+            // See: http://ondras.github.io/rot.js/manual/#timing/engine for some more information.
+            if (waitForMove) {
                 return {
                     then: function (resolve) {
                         _this.deferAction(resolve, CustomEvents_2.ActionCompleteEventType);
@@ -127,8 +172,8 @@ var BasicMonsterAi = (function (_super) {
         // who did we bump into?
         var entityComponent = data.targetComponent.node.getJSComponent("Entity");
         // just attack, don't allow for picking up items or other bump actions
-        // TODO: hard coding needs to be removed
-        if (entityComponent.attackable && data.targetComponent.node.name != "entity_player") {
+        var common = data.targetComponent.node.getJSComponent("Common");
+        if (entityComponent.attackable && common && common.isPlayer) {
             // here we need to recreate the event object because it will get GCd
             this.node.sendEvent(CustomEvents_2.AttackEntityEventData({
                 senderComponent: this,
@@ -145,12 +190,11 @@ var BasicMonsterAi = (function (_super) {
      */
     BasicMonsterAi.prototype.onHandleAttackEntity = function (data) {
         this.DEBUG("Attack Entity");
-        this.DEBUG(data.targetComponent.typeName);
         // figure out damage and send it over
         data.targetComponent.node.sendEvent(CustomEvents_1.HitEventData({
             attackerComponent: this
         }));
-        this.sendEvent(CustomEvents_2.LogMessageEventData({ message: this.getEntityName(data.senderComponent) + " attacked player." }));
+        this.sendEvent(CustomEvents_2.LogMessageEventData({ message: this.getEntityName(data.senderComponent) + " attacked you." }));
         this.node.sendEvent(CustomEvents_2.MoveEntityCompleteEventData());
     };
     /**
@@ -160,8 +204,8 @@ var BasicMonsterAi = (function (_super) {
     BasicMonsterAi.prototype.onHit = function (data) {
         this.DEBUG("Got hit by something");
         // calculate damage and then send the damage event
-        this.node.sendEvent(CustomEvents_2.DamageEntityEventData({
-            value: data.attackerComponent.calculateAttackValue()
+        this.node.sendEvent(CustomEvents_2.AdjustEntityHealthEventData({
+            value: data.attackerComponent.calculateAttackValue() * -1
         }));
     };
     /* Attacker Interface */
@@ -171,19 +215,6 @@ var BasicMonsterAi = (function (_super) {
             return attack.attackValue;
         }
         throw new Error("No attack component defined!");
-    };
-    BasicMonsterAi.prototype.onActionComplete = function () {
-        this.DEBUG("OnActionComplete");
-        // call the callback, notifying the scheduler that we are done, but
-        // wait until all pending activities have finished
-        /*
-        if (this.resolveTurn) {
-            setImmediate(() => {
-                this.DEBUG("End of turn.");
-                this.resolveTurn();
-            });
-        }
-        */
     };
     BasicMonsterAi.prototype.onDestroy = function () {
         var _this = this;

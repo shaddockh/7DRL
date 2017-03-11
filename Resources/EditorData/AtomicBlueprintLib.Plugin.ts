@@ -90,6 +90,7 @@ class AtomicBlueprintlibPlugin implements Editor.HostExtensions.HostEditorServic
         try {
             this.loadBlueprintCatalog();
             blueprintLib.generatePrefabs();
+            ToolCore.assetDatabase.reimportAllAssets();
         } finally {
             blueprintLib.reset();
         }
