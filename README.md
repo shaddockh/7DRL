@@ -82,3 +82,20 @@ __Ideas__
 - hears increase health
 - player can actually die
   
+### Was it a success?
+ Location - https://github.com/shaddockh/7DRL/tree/7DRL2017 
+ Partial success. 
+ 
+ #### Berlin Interpretation (http://www.roguebasin.com/index.php?title=Berlin_Interpretation) 
+ - [x] Random Environment Generation 
+ - [x] Permadeath 
+ - [x] Turn Based 
+ - [x] Grid Based 
+ - [x] Non-Modal 
+ - [ ] Complexity 
+ - [ ] 
+ - Resource Management 
+ - [x] Hack n Slash 
+ - [ ] Exploration and Discovery
+
+Fun? Not really.
