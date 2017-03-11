@@ -73,4 +73,12 @@ __Ideas__
   - handle player death
   - implement the key to unlock the door to the next level
   - have the hearts increase health
+
+### Day 7 - March 10, 2017
+- intro instructions
+- monsters follow and attack you if you get near
+- doors are locked at level start
+- getting a key unlocks the door
+- hears increase health
+- player can actually die
   
