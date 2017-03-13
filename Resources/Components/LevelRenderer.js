@@ -91,6 +91,7 @@ var LevelRenderer = (function (_super) {
                 }
                 else {
                     // update the player position here
+                    currentLevel.entities.replaceAt(index, _this.player.getJSComponent("Entity"));
                     _this.player.getJSComponent("Entity").gridPosition = e.gridPosition;
                     _this.player.position2D = [e.gridPosition[0] * scaleX_1, e.gridPosition[1] * scaleYChar_1];
                     var ero = _this.player.getJSComponent("EntityRenderOptions");

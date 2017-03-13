@@ -103,6 +103,7 @@ export default class LevelRenderer extends CustomJSComponent {
                     this.childNodes.push(entityNode);
                 } else {
                     // update the player position here
+                    currentLevel.entities.replaceAt(index, this.player.getJSComponent<Entity>("Entity"));
                     this.player.getJSComponent<Entity>("Entity").gridPosition = e.gridPosition;
                     this.player.position2D = [e.gridPosition[0] * scaleX, e.gridPosition[1] * scaleYChar];
 
