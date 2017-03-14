@@ -55,4 +55,3 @@ var Entity = (function (_super) {
     return Entity;
 }(CustomJSComponent_1.default));
 exports.default = Entity;
-//# sourceMappingURL=Entity.js.map

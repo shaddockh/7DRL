@@ -85,4 +85,3 @@ var List = (function (_super) {
     return List;
 }(Atomic.ScriptObject));
 exports.default = List;
-//# sourceMappingURL=List.js.map

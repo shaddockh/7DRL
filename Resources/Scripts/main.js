@@ -23,4 +23,3 @@ function ready() {
         depth: 1
     }));
 }
-//# sourceMappingURL=main.js.map

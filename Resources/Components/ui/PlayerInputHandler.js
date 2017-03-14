@@ -106,4 +106,3 @@ var PlayerInputHandler = (function (_super) {
     return PlayerInputHandler;
 }(CustomJSComponent_1.default));
 exports.default = PlayerInputHandler;
-//# sourceMappingURL=PlayerInputHandler.js.map

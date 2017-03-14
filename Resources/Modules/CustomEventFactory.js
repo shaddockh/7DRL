@@ -62,4 +62,3 @@ function buildNotifyEventData(eventType) {
     };
 }
 exports.buildNotifyEventData = buildNotifyEventData;
-//# sourceMappingURL=CustomEventFactory.js.map

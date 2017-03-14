@@ -21,4 +21,3 @@ exports.tile_floor = {
         sprite: "Sprites/PlanetCute/DirtBlock.png"
     }
 };
-//# sourceMappingURL=tiles.js.map

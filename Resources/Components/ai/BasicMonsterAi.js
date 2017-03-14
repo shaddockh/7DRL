@@ -227,4 +227,3 @@ var BasicMonsterAi = (function (_super) {
     return BasicMonsterAi;
 }(CustomJSComponent_1.default));
 exports.default = BasicMonsterAi;
-//# sourceMappingURL=BasicMonsterAi.js.map

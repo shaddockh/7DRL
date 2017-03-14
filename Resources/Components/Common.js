@@ -31,4 +31,3 @@ var Common = (function (_super) {
     return Common;
 }(CustomJSComponent_1.default));
 exports.default = Common;
-//# sourceMappingURL=Common.js.map

@@ -105,4 +105,3 @@ var AtomicBlueprintlibPlugin = (function () {
     return AtomicBlueprintlibPlugin;
 }());
 exports.default = new AtomicBlueprintlibPlugin();
-//# sourceMappingURL=AtomicBlueprintLib.Plugin.js.map

@@ -65,4 +65,3 @@ var Door = (function (_super) {
     return Door;
 }(CustomJSComponent_1.default));
 exports.default = Door;
-//# sourceMappingURL=Door.js.map

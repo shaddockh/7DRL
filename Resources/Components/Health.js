@@ -44,4 +44,3 @@ var Health = (function (_super) {
     return Health;
 }(CustomJSComponent_1.default));
 exports.default = Health;
-//# sourceMappingURL=Health.js.map

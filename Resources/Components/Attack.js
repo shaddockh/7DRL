@@ -29,4 +29,3 @@ var Attack = (function (_super) {
     return Attack;
 }(CustomJSComponent_1.default));
 exports.default = Attack;
-//# sourceMappingURL=Attack.js.map

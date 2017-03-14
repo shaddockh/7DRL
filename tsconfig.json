@@ -6,7 +6,7 @@
         "module": "commonjs",
         "declaration": false,
         "inlineSourceMap": false,
-        "sourceMap": true,
+        "sourceMap": false,
         "removeComments": false,
         "noLib": false,
         "forceConsistentCasingInFileNames": true,

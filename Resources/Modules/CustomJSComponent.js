@@ -71,4 +71,3 @@ var CustomJSComponent = (function (_super) {
     return CustomJSComponent;
 }(Atomic.JSComponent));
 exports.default = CustomJSComponent;
-//# sourceMappingURL=CustomJSComponent.js.map

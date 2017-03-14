@@ -72,4 +72,3 @@ var LevelController = (function (_super) {
     return LevelController;
 }(CustomJSComponent_1.default));
 exports.default = LevelController;
-//# sourceMappingURL=LevelController.js.map

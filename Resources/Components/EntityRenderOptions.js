@@ -54,4 +54,3 @@ var EntityRenderOptions = (function (_super) {
     return EntityRenderOptions;
 }(CustomJSComponent_1.default));
 exports.default = EntityRenderOptions;
-//# sourceMappingURL=EntityRenderOptions.js.map

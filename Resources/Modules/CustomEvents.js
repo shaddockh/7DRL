@@ -56,4 +56,3 @@ exports.TurnTakenEvent = CustomEventFactory.buildNotifyEvent("TurnTaken");
 exports.TurnTakenEventData = CustomEventFactory.buildNotifyEventData("TurnTaken");
 exports.PlayerAttributeChangedEvent = CustomEventFactory.buildEvent("PlayerAttributeChanged");
 exports.PlayerAttributeChangedEventData = CustomEventFactory.buildEventData("PlayerAttributeChanged");
-//# sourceMappingURL=CustomEvents.js.map

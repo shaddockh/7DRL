@@ -54,4 +54,3 @@ var Heart = (function (_super) {
     return Heart;
 }(CustomJSComponent_1.default));
 exports.default = Heart;
-//# sourceMappingURL=Heart.js.map

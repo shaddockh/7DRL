@@ -113,4 +113,3 @@ var LevelRenderer = (function (_super) {
     return LevelRenderer;
 }(CustomJSComponent_1.default));
 exports.default = LevelRenderer;
-//# sourceMappingURL=LevelRenderer.js.map
