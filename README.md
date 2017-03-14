@@ -1,5 +1,15 @@
 # 7DRL 2017
 
+## Post Competition Updates
+
+There were a couple of game breaking bugs in the original competition release that this fixes
+- null pointer error on null
+- entities responding to other entities end of turn messages which was causing serious issues
+
+
+
+## Competition
+
 My entry for the 2017 7DRL is an attempt to create a more traditional roguelike.
 
 __Technology and Art__
