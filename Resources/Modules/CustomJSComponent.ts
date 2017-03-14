@@ -42,24 +42,22 @@ export default class CustomJSComponent extends Atomic.JSComponent {
 
     // Need to make this a part of the class so it doesn't get GC'd before the event fires
     private deferredActionHandler: Atomic.ScriptObject = null;
-    deferAction(callback: () => void, eventName?: string) {
+    deferAction(callback: () => void, eventName: string = Atomic.UpdateEventType, sender?: Atomic.AObject) {
         if (!this.deferredActionHandler) {
             this.deferredActionHandler = new Atomic.ScriptObject();
         }
 
-        if (eventName) {
-            this.DEBUG("Listening for deferred action:" + eventName);
-            this.deferredActionHandler.subscribeToEvent(Atomic.ScriptEvent(eventName, () => {
-                this.DEBUG("Called deferred event: " + eventName);
-                this.deferredActionHandler.unsubscribeFromEvent(eventName);
-                callback();
-            }));
+        this.DEBUG("Waiting for deferred event: " + eventName);
+        const tempCallback = () => {
+            this.DEBUG("Called deferred event: " + eventName + " from " + this.deferredActionHandler.eventSender["name"]);
+            this.deferredActionHandler.unsubscribeFromEvent(eventName);
+            callback();
+        };
+
+        if (sender) {
+            this.deferredActionHandler.subscribeToEvent(sender, Atomic.ScriptEvent(eventName, tempCallback));
         } else {
-            this.deferredActionHandler.subscribeToEvent(Atomic.UpdateEvent(() => {
-                this.DEBUG("Called deferred event");
-                this.deferredActionHandler.unsubscribeFromEvent(Atomic.UpdateEventType);
-                callback();
-            }));
+            this.deferredActionHandler.subscribeToEvent(Atomic.ScriptEvent(eventName, tempCallback));
         }
     }
 }

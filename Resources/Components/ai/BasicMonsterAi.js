@@ -153,7 +153,7 @@ var BasicMonsterAi = (function (_super) {
             if (waitForMove) {
                 return {
                     then: function (resolve) {
-                        _this.deferAction(resolve, CustomEvents_2.ActionCompleteEventType);
+                        _this.deferAction(resolve, CustomEvents_2.ActionCompleteEventType, _this.node);
                     }
                 };
             }

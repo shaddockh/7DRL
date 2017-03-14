@@ -75,7 +75,7 @@ var PlayerAi = (function (_super) {
             // See: http://ondras.github.io/rot.js/manual/#timing/engine for some more information.
             return {
                 then: function (resolve) {
-                    _this.deferAction(resolve, CustomEvents_2.ActionCompleteEventType);
+                    _this.deferAction(resolve, CustomEvents_2.ActionCompleteEventType, _this.node);
                 }
             };
         }

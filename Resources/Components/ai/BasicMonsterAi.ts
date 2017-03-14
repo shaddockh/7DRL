@@ -200,7 +200,7 @@ export default class BasicMonsterAi extends CustomJSComponent implements Attacke
             if (waitForMove) {
                 return {
                     then: (resolve) => {
-                        this.deferAction(resolve, ActionCompleteEventType);
+                        this.deferAction(resolve, ActionCompleteEventType, this.node);
                     }
                 };
             }

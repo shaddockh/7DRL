@@ -101,7 +101,7 @@ export default class PlayerAi extends CustomJSComponent implements Attacker {
             // See: http://ondras.github.io/rot.js/manual/#timing/engine for some more information.
             return {
                 then: (resolve) => {
-                    this.deferAction(resolve, ActionCompleteEventType);
+                    this.deferAction(resolve, ActionCompleteEventType, this.node);
                 }
             };
         }

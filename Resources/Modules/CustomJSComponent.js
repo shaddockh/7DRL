@@ -49,25 +49,23 @@ var CustomJSComponent = (function (_super) {
         // fallback
         return targetComponent.node.name;
     };
-    CustomJSComponent.prototype.deferAction = function (callback, eventName) {
+    CustomJSComponent.prototype.deferAction = function (callback, eventName, sender) {
         var _this = this;
+        if (eventName === void 0) { eventName = Atomic.UpdateEventType; }
         if (!this.deferredActionHandler) {
             this.deferredActionHandler = new Atomic.ScriptObject();
         }
-        if (eventName) {
-            this.DEBUG("Listening for deferred action:" + eventName);
-            this.deferredActionHandler.subscribeToEvent(Atomic.ScriptEvent(eventName, function () {
-                _this.DEBUG("Called deferred event: " + eventName);
-                _this.deferredActionHandler.unsubscribeFromEvent(eventName);
-                callback();
-            }));
+        this.DEBUG("Waiting for deferred event: " + eventName);
+        var tempCallback = function () {
+            _this.DEBUG("Called deferred event: " + eventName + " from " + _this.deferredActionHandler.eventSender["name"]);
+            _this.deferredActionHandler.unsubscribeFromEvent(eventName);
+            callback();
+        };
+        if (sender) {
+            this.deferredActionHandler.subscribeToEvent(sender, Atomic.ScriptEvent(eventName, tempCallback));
         }
         else {
-            this.deferredActionHandler.subscribeToEvent(Atomic.UpdateEvent(function () {
-                _this.DEBUG("Called deferred event");
-                _this.deferredActionHandler.unsubscribeFromEvent(Atomic.UpdateEventType);
-                callback();
-            }));
+            this.deferredActionHandler.subscribeToEvent(Atomic.ScriptEvent(eventName, tempCallback));
         }
     };
     return CustomJSComponent;
