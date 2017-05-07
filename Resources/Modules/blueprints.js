@@ -1,3 +1,4 @@
+"use strict";
 /*
   Blueprints live here.  You can either define
   them in this module by using the format:
@@ -20,7 +21,6 @@
 
     export * from "./blueprints/myblueprints";
 */
-"use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }

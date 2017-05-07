@@ -35,6 +35,9 @@ var LevelController = (function (_super) {
     LevelController.prototype.registerActor = function (data) {
         this.DEBUG("Actor registered with scheduler");
         this.scheduler.add(data.ai, true);
+        // TODO: This shouldn't be needed, but for some reason the scheduler isn't triggering if entities are added after the engine
+        // has become unlocked
+        this.engine.unlock();
     };
     LevelController.prototype.deregisterActor = function (data) {
         this.DEBUG("Actor deregistered from scheduler");
@@ -49,6 +52,7 @@ var LevelController = (function (_super) {
         if (!this.engine) {
             this.scheduler = new ROT.Scheduler.Simple();
             this.engine = new ROT.Engine(this.scheduler);
+            this.DEBUG("Starting engine");
             this.engine.start();
         }
         else {
@@ -58,11 +62,12 @@ var LevelController = (function (_super) {
             name: "depth",
             value: eventData.depth
         }));
-        this.sendEvent(CustomEvents_1.RegisterLevelActorsEventData({
-            levelController: this
-        }));
         // Let's let eveything load an then unlock the engine
         this.deferAction(function () {
+            _this.DEBUG("Asking all entities to register themselves");
+            _this.sendEvent(CustomEvents_1.RegisterLevelActorsEventData({
+                levelController: _this
+            }));
             _this.DEBUG("Unlocking engine");
             _this.engine.unlock();
         });

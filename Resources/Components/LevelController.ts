@@ -38,6 +38,10 @@ export default class LevelController extends CustomJSComponent {
     registerActor(data: RegisterActorAiEvent) {
         this.DEBUG("Actor registered with scheduler");
         this.scheduler.add(data.ai, true);
+
+        // TODO: This shouldn't be needed, but for some reason the scheduler isn't triggering if entities are added after the engine
+        // has become unlocked
+        this.engine.unlock();
     }
 
     deregisterActor(data: RegisterActorAiEvent) {
@@ -52,9 +56,10 @@ export default class LevelController extends CustomJSComponent {
         this.sendEvent(RenderCurrentLevelEventData());
 
         if (!this.engine) {
-
             this.scheduler = new ROT.Scheduler.Simple();
             this.engine = new ROT.Engine(this.scheduler);
+
+            this.DEBUG("Starting engine");
             this.engine.start();
         } else {
             this.scheduler.clear();
@@ -65,12 +70,13 @@ export default class LevelController extends CustomJSComponent {
             value: eventData.depth
         }));
 
-        this.sendEvent(RegisterLevelActorsEventData({
-            levelController: this
-        }));
-
         // Let's let eveything load an then unlock the engine
         this.deferAction(() => {
+            this.DEBUG("Asking all entities to register themselves");
+            this.sendEvent(RegisterLevelActorsEventData({
+                levelController: this
+            }));
+
             this.DEBUG("Unlocking engine");
             this.engine.unlock();
         });
@@ -78,5 +84,4 @@ export default class LevelController extends CustomJSComponent {
         // one-time 
         // this.sendEvent(PlayerActionBeginEventData());
     }
-
 }

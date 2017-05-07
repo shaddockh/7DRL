@@ -1,19 +1,21 @@
 <?xml version="1.0"?>
 <scene id="1">
-	<attribute name="Name" value="" />
+	<attribute name="Name" value="MainScene" />
 	<attribute name="Time Scale" value="1" />
 	<attribute name="Smoothing Constant" value="50" />
 	<attribute name="Snap Threshold" value="5" />
 	<attribute name="Elapsed Time" value="0" />
-	<attribute name="Next Replicated Node ID" value="384" />
-	<attribute name="Next Replicated Component ID" value="2007" />
+	<attribute name="Next Replicated Node ID" value="385" />
+	<attribute name="Next Replicated Component ID" value="2008" />
 	<attribute name="Next Local Node ID" value="16778496" />
 	<attribute name="Next Local Component ID" value="16777216" />
 	<attribute name="Variables" />
 	<attribute name="Variable Names" value="" />
 	<component type="PhysicsWorld" id="1" />
 	<component type="Octree" id="2" />
-	<component type="DebugRenderer" id="3" />
+	<component type="DebugRenderer" id="3">
+		<attribute name="Line Antialias" value="true" />
+	</component>
 	<component type="Renderer2D" id="1976" />
 	<component type="JSComponent" id="1992">
 		<attribute name="ComponentFile" value="JSComponentFile;Components/LevelController.js" />
@@ -56,7 +58,6 @@
 			</attribute>
 		</component>
 		<component type="JSComponent" id="1998">
-			<attribute name="ComponentFile" value="JSComponentFile;Components/ui/LogListener.js" />
 			<attribute name="FieldValues">
 				<variant name="debug" type="Bool" value="true" />
 			</attribute>

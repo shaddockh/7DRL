@@ -14,7 +14,7 @@ const scene = Atomic.player.loadScene("Scenes/Scene.scene");
 
 // Let the scene load and then start working on the first update cycle
 let so = new Atomic.ScriptObject();
-so.subscribeToEvent(Atomic.UpdateEvent(ready));
+so.subscribeToEvent(Atomic.SceneUpdateEvent(ready));
 
 function ready() {
     so.unsubscribeFromAllEvents();

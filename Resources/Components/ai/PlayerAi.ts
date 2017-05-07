@@ -39,7 +39,7 @@ export default class PlayerAi extends CustomJSComponent implements Attacker {
      * Fields witihin the inspectorFields object will be exposed to the editor
      */
     inspectorFields = {
-        debug: true,
+        debug: false,
         attackComponentName: "Attack",
         alive: true
     };
@@ -77,6 +77,7 @@ export default class PlayerAi extends CustomJSComponent implements Attacker {
 
         // called when we are moving to a new level
         this.subscribeToEvent(RegisterLevelActorsEvent(() => {
+            this.DEBUG("Got a request to register ourself");
             this.sendEvent(RegisterActorAiEventData({ ai: this }));
         }));
 
@@ -90,7 +91,7 @@ export default class PlayerAi extends CustomJSComponent implements Attacker {
     }
 
     act() {
-        this.DEBUG("Called Act");
+        this.DEBUG("Called Act on PlayerAI");
         if (this.alive) {
             this.sendEvent(PlayerActionBeginEventData());
 

@@ -15,9 +15,22 @@ declare module "rot" {
         }
 
         interface Scheduler {
+            /**
+             * Add an item to the scheduler
+             */
             add(item: Actionable, repeat: boolean);
             remove(item: Actionable);
+
+            /**
+             *Clear all items from the scheduler
+             */
             clear();
+            /**
+             * Schedule next item
+             */
+            next();
+
+            getTime(): number;
         }
 
         module Scheduler {
@@ -26,6 +39,8 @@ declare module "rot" {
                 add(item: Actionable, repeat: boolean);
                 remove(item: Actionable);
                 clear();
+                next();
+                getTime(): number;
             }
         }
 

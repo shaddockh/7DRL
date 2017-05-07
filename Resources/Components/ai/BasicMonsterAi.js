@@ -26,7 +26,7 @@ var BasicMonsterAi = (function (_super) {
          * Fields witihin the inspectorFields object will be exposed to the editor
          */
         _this.inspectorFields = {
-            debug: true,
+            debug: false,
             wanderChance: 25,
             attackComponentName: "Attack",
             sightRadius: 4
@@ -66,7 +66,7 @@ var BasicMonsterAi = (function (_super) {
     BasicMonsterAi.prototype.act = function () {
         var _this = this;
         if (this.alive) {
-            this.DEBUG("Act");
+            this.DEBUG("Called Act on BasicMonsterAI");
             var currentLevel = this.node.scene.getJSComponent("LevelController").currentLevel;
             var levelController_1 = this.node.scene.getJSComponent("LevelController");
             var hero_1;

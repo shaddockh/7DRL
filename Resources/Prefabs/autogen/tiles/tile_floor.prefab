@@ -9,5 +9,6 @@
 	<attribute name="Variables" />
 	<component type="StaticSprite2D" id="11">
 		<attribute name="Sprite" value="Sprite2D;Sprites/PlanetCute/DirtBlock.png" />
+		<attribute name="Draw Rectangle" value="-0.505 -0.855 0.505 0.855" />
 	</component>
 </node>

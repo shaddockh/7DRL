@@ -15,11 +15,12 @@
 	</component>
 	<component type="StaticSprite2D" id="6">
 		<attribute name="Sprite" value="Sprite2D;Sprites/PlanetCute/EnemyBug.png" />
+		<attribute name="Draw Rectangle" value="-0.505 -0.855 0.505 0.855" />
 	</component>
 	<component type="JSComponent" id="16777236">
 		<attribute name="ComponentFile" value="JSComponentFile;Components/Entity.js" />
 		<attribute name="FieldValues">
-			<variant name="debug" type="Bool" value="true" />
+			<variant name="debug" type="Bool" value="false" />
 			<variant name="bumpable" type="Bool" value="true" />
 			<variant name="attackable" type="Bool" value="true" />
 			<variant name="blocksPath" type="Bool" value="true" />
@@ -36,13 +37,13 @@
 		<attribute name="FieldValues">
 			<variant name="gridPixelSizeX" type="Float" value="101" />
 			<variant name="gridPixelSizeY" type="Float" value="80" />
-			<variant name="debug" type="Bool" value="true" />
+			<variant name="debug" type="Bool" value="false" />
 		</attribute>
 	</component>
 	<component type="JSComponent" id="16777239">
 		<attribute name="ComponentFile" value="JSComponentFile;Components/Health.js" />
 		<attribute name="FieldValues">
-			<variant name="debug" type="Bool" value="true" />
+			<variant name="debug" type="Bool" value="false" />
 			<variant name="life" type="Float" value="2" />
 		</attribute>
 	</component>
@@ -50,6 +51,7 @@
 		<attribute name="ComponentFile" value="JSComponentFile;Components/ai/BasicMonsterAi.js" />
 		<attribute name="FieldValues">
 			<variant name="wanderChance" type="Float" value="23" />
+			<variant name="debug" type="Bool" value="true" />
 		</attribute>
 	</component>
 	<component type="JSComponent" id="16777241">

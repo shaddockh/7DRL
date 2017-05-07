@@ -7,7 +7,7 @@ import CustomJSComponent from "Modules/CustomJSComponent";
 
 export default class EntityRenderOptions extends CustomJSComponent {
     inspectorFields = {
-        debug: true,
+        debug: false,
         orderInLayer: 2,
         slicesInLayer: 4,
         yOffset: 40

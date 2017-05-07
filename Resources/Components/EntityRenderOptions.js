@@ -18,7 +18,7 @@ var EntityRenderOptions = (function (_super) {
     function EntityRenderOptions() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.inspectorFields = {
-            debug: true,
+            debug: false,
             orderInLayer: 2,
             slicesInLayer: 4,
             yOffset: 40

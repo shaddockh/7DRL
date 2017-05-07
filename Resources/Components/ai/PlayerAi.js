@@ -23,7 +23,7 @@ var PlayerAi = (function (_super) {
          * Fields witihin the inspectorFields object will be exposed to the editor
          */
         _this.inspectorFields = {
-            debug: true,
+            debug: false,
             attackComponentName: "Attack",
             alive: true
         };
@@ -54,6 +54,7 @@ var PlayerAi = (function (_super) {
         this.subscribeToEvent(CustomEvents_1.SkipTurnEvent(this.onSkipTurn.bind(this)));
         // called when we are moving to a new level
         this.subscribeToEvent(CustomEvents_2.RegisterLevelActorsEvent(function () {
+            _this.DEBUG("Got a request to register ourself");
             _this.sendEvent(CustomEvents_2.RegisterActorAiEventData({ ai: _this }));
         }));
         // TODO: make this message based 
@@ -65,7 +66,7 @@ var PlayerAi = (function (_super) {
     };
     PlayerAi.prototype.act = function () {
         var _this = this;
-        this.DEBUG("Called Act");
+        this.DEBUG("Called Act on PlayerAI");
         if (this.alive) {
             this.sendEvent(CustomEvents_2.PlayerActionBeginEventData());
             // we are returning a 'thenable' which tells the scheduler to not move on to the next actor

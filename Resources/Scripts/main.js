@@ -13,7 +13,7 @@ atomic_blueprintlib_1.catalog.hydrateAllBlueprints();
 var scene = Atomic.player.loadScene("Scenes/Scene.scene");
 // Let the scene load and then start working on the first update cycle
 var so = new Atomic.ScriptObject();
-so.subscribeToEvent(Atomic.UpdateEvent(ready));
+so.subscribeToEvent(Atomic.SceneUpdateEvent(ready));
 function ready() {
     so.unsubscribeFromAllEvents();
     var generator = new LevelGenerator_1.default(30, 30, true);

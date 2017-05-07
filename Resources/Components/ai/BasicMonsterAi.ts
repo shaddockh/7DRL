@@ -59,7 +59,7 @@ export default class BasicMonsterAi extends CustomJSComponent implements Attacke
      * Fields witihin the inspectorFields object will be exposed to the editor
      */
     inspectorFields: BasicMonsterAiInspectorFields = {
-        debug: true,
+        debug: false,
         wanderChance: 25,
         attackComponentName: "Attack",
         sightRadius: 4
@@ -102,7 +102,7 @@ export default class BasicMonsterAi extends CustomJSComponent implements Attacke
 
     act() {
         if (this.alive) {
-            this.DEBUG("Act");
+            this.DEBUG("Called Act on BasicMonsterAI");
             let currentLevel = this.node.scene.getJSComponent<LevelController>("LevelController").currentLevel;
 
             const levelController = this.node.scene.getJSComponent<LevelController>("LevelController");

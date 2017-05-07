@@ -11,7 +11,7 @@ exports.entity_base = {
         blendMode: Atomic.BlendMode.BLEND_ALPHA
     },
     Entity: {
-        debug: true
+        debug: false
     },
     EntityRenderOptions: {
         yOffset: 40
@@ -41,10 +41,10 @@ exports.entity_actor = {
     GridMover: {
         gridPixelSizeX: 101,
         gridPixelSizeY: 80,
-        debug: true
+        debug: false
     },
     Health: {
-        debug: true
+        debug: false
     }
 };
 exports.entity_player = {
@@ -61,7 +61,9 @@ exports.entity_player = {
         attackable: true,
         blocksPath: true
     },
-    PlayerAi: {},
+    PlayerAi: {
+        debug: true
+    },
     Health: {
         life: 15
     },
@@ -83,7 +85,8 @@ exports.entity_beetle = {
         blocksPath: true
     },
     BasicMonsterAi: {
-        wanderChance: 23
+        wanderChance: 23,
+        debug: true
     },
     Health: {
         life: 2
