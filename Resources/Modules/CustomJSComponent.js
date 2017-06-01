@@ -49,9 +49,15 @@ var CustomJSComponent = (function (_super) {
         // fallback
         return targetComponent.node.name;
     };
-    CustomJSComponent.prototype.deferAction = function (callback, eventName, sender) {
+    /**
+     * Defer an action until a named event comes in
+     * @param callback the action to perform when the event comes in
+     * @param eventName the event name to listen for
+     * @param sender defaults to only listen to events coming from the node that contains this component, but can be set to null to listen to all events or a particular node
+     */
+    CustomJSComponent.prototype.deferUntilEvent = function (callback, eventName, sender) {
         var _this = this;
-        if (eventName === void 0) { eventName = Atomic.UpdateEventType; }
+        if (sender === void 0) { sender = this.node; }
         if (!this.deferredActionHandler) {
             this.deferredActionHandler = new Atomic.ScriptObject();
         }
@@ -67,6 +73,13 @@ var CustomJSComponent = (function (_super) {
         else {
             this.deferredActionHandler.subscribeToEvent(Atomic.ScriptEvent(eventName, tempCallback));
         }
+    };
+    /**
+     * defers execution of the callback until the next update cycle
+     * @param callback
+     */
+    CustomJSComponent.prototype.deferUntilUpdate = function (callback) {
+        this.deferUntilEvent(callback, Atomic.UpdateEventType, null);
     };
     return CustomJSComponent;
 }(Atomic.JSComponent));

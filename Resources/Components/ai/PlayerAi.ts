@@ -28,7 +28,8 @@ import {
     RegisterActorAiEventData,
     RegisterLevelActorsEvent,
     TurnTakenEvent,
-    TurnTakenEventData
+    TurnTakenEventData,
+    DeregisterActorAiEventData
 } from "Modules/CustomEvents";
 import CustomJSComponent from "Modules/CustomJSComponent";
 "atomic component";
@@ -102,7 +103,20 @@ export default class PlayerAi extends CustomJSComponent implements Attacker {
             // See: http://ondras.github.io/rot.js/manual/#timing/engine for some more information.
             return {
                 then: (resolve) => {
-                    this.deferAction(resolve, ActionCompleteEventType, this.node);
+                    // Strange race condition here..need to get out of the event loop and call the resolve
+                    // on the next update or else we get into an infinite loop because the prior event trigger
+                    // has not cleared out of the queue by the time this gets scheduled again.
+                    this.deferUntilEvent(() => {
+                        this.deferUntilUpdate(resolve);
+                    }, ActionCompleteEventType);
+                }
+            };
+        } else {
+            this.DEBUG("Actor is not alive");
+            return {
+                then: (resolve) => {
+                    // Let the update loop happen and then resolve
+                    this.deferUntilUpdate(resolve);
                 }
             };
         }
@@ -207,9 +221,10 @@ export default class PlayerAi extends CustomJSComponent implements Attacker {
         this.alive = false;
 
         this.node.scale2D = 0; // hide
+        this.sendEvent(DeregisterActorAiEventData({ ai: this }));
         this.sendEvent(PlayerDiedEventData());
-        // this.deferAction(() => {
-        // Atomic.destroy(this.node);
-        // });
+        this.deferUntilUpdate(() => {
+            Atomic.destroy(this.node);
+        });
     }
 }

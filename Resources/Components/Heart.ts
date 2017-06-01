@@ -43,7 +43,7 @@ export default class Heart extends CustomJSComponent {
             }));
 
             this.node.sendEvent(DestroyEntityEventData());
-            this.deferAction(() => Atomic.destroy(this.node));
+            this.deferUntilUpdate(() => Atomic.destroy(this.node));
         }
     }
 }

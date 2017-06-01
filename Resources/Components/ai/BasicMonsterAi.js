@@ -95,7 +95,7 @@ var BasicMonsterAi = (function (_super) {
                     gl_matrix_1.vec2.normalize(dir_1, dir_1);
                     // Let's defer the movement to the next update so we have time
                     // to wire up the resolve.
-                    this.deferAction(function () {
+                    this.deferUntilUpdate(function () {
                         _this.node.sendEvent(CustomEvents_2.MoveEntityByOffsetEventData({
                             position: [dir_1[0], dir_1[1]]
                         }));
@@ -133,7 +133,7 @@ var BasicMonsterAi = (function (_super) {
                         // this.DEBUG(targetPos);
                         // Let's defer the movement to the next update so we have time
                         // to wire up the resolve.
-                        this.deferAction(function () {
+                        this.deferUntilUpdate(function () {
                             _this.node.sendEvent(CustomEvents_2.MoveEntityByOffsetEventData({
                                 position: targetPos_1
                             }));
@@ -153,7 +153,20 @@ var BasicMonsterAi = (function (_super) {
             if (waitForMove) {
                 return {
                     then: function (resolve) {
-                        _this.deferAction(resolve, CustomEvents_2.ActionCompleteEventType, _this.node);
+                        _this.deferUntilEvent(function () {
+                            // Let the update loop happen and then resolve
+                            _this.DEBUG("moving");
+                            _this.deferUntilUpdate(resolve);
+                        }, CustomEvents_2.ActionCompleteEventType);
+                    }
+                };
+            }
+            else {
+                return {
+                    then: function (resolve) {
+                        // Let the update loop happen and then resolve
+                        _this.DEBUG("waiting");
+                        _this.deferUntilUpdate(resolve);
                     }
                 };
             }
@@ -220,7 +233,8 @@ var BasicMonsterAi = (function (_super) {
         var _this = this;
         this.DEBUG("Destroy");
         this.alive = false;
-        this.deferAction(function () {
+        this.sendEvent(CustomEvents_2.DeregisterActorAiEventData({ ai: this }));
+        this.deferUntilUpdate(function () {
             Atomic.destroy(_this.node);
         });
     };

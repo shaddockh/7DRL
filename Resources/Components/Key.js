@@ -39,7 +39,7 @@ var Key = (function (_super) {
             this.node.sendEvent(CustomEvents_1.LogMessageEventData({ message: "You found a key!" }));
             this.node.sendEvent(CustomEvents_2.KeyPickedUpEventData({ keyId: this.keyId }));
             this.node.sendEvent(CustomEvents_2.DestroyEntityEventData());
-            this.deferAction(function () { return Atomic.destroy(_this.node); });
+            this.deferUntilUpdate(function () { return Atomic.destroy(_this.node); });
         }
     };
     return Key;

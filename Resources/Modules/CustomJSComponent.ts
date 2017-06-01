@@ -42,7 +42,13 @@ export default class CustomJSComponent extends Atomic.JSComponent {
 
     // Need to make this a part of the class so it doesn't get GC'd before the event fires
     private deferredActionHandler: Atomic.ScriptObject = null;
-    deferAction(callback: () => void, eventName: string = Atomic.UpdateEventType, sender?: Atomic.AObject) {
+    /**
+     * Defer an action until a named event comes in
+     * @param callback the action to perform when the event comes in
+     * @param eventName the event name to listen for
+     * @param sender defaults to only listen to events coming from the node that contains this component, but can be set to null to listen to all events or a particular node
+     */
+    deferUntilEvent(callback: () => void, eventName: string, sender: Atomic.AObject = this.node) {
         if (!this.deferredActionHandler) {
             this.deferredActionHandler = new Atomic.ScriptObject();
         }
@@ -59,5 +65,13 @@ export default class CustomJSComponent extends Atomic.JSComponent {
         } else {
             this.deferredActionHandler.subscribeToEvent(Atomic.ScriptEvent(eventName, tempCallback));
         }
+    }
+
+    /**
+     * defers execution of the callback until the next update cycle
+     * @param callback 
+     */
+    deferUntilUpdate(callback: () => void) {
+        this.deferUntilEvent(callback, Atomic.UpdateEventType, null);
     }
 }

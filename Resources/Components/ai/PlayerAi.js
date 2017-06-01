@@ -76,7 +76,21 @@ var PlayerAi = (function (_super) {
             // See: http://ondras.github.io/rot.js/manual/#timing/engine for some more information.
             return {
                 then: function (resolve) {
-                    _this.deferAction(resolve, CustomEvents_2.ActionCompleteEventType, _this.node);
+                    // Strange race condition here..need to get out of the event loop and call the resolve
+                    // on the next update or else we get into an infinite loop because the prior event trigger
+                    // has not cleared out of the queue by the time this gets scheduled again.
+                    _this.deferUntilEvent(function () {
+                        _this.deferUntilUpdate(resolve);
+                    }, CustomEvents_2.ActionCompleteEventType);
+                }
+            };
+        }
+        else {
+            this.DEBUG("Actor is not alive");
+            return {
+                then: function (resolve) {
+                    // Let the update loop happen and then resolve
+                    _this.deferUntilUpdate(resolve);
                 }
             };
         }
@@ -164,13 +178,15 @@ var PlayerAi = (function (_super) {
         throw new Error("No attack component defined!");
     };
     PlayerAi.prototype.onDestroy = function () {
+        var _this = this;
         this.DEBUG("Destroy");
         this.alive = false;
         this.node.scale2D = 0; // hide
+        this.sendEvent(CustomEvents_2.DeregisterActorAiEventData({ ai: this }));
         this.sendEvent(CustomEvents_2.PlayerDiedEventData());
-        // this.deferAction(() => {
-        // Atomic.destroy(this.node);
-        // });
+        this.deferUntilUpdate(function () {
+            Atomic.destroy(_this.node);
+        });
     };
     return PlayerAi;
 }(CustomJSComponent_1.default));

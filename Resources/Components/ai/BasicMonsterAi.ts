@@ -24,7 +24,8 @@ import {
     AdjustEntityHealthEvent,
     HitEvent,
     MoveEntityCompleteEventData,
-    LogMessageEventData
+    LogMessageEventData,
+    DeregisterActorAiEventData
 } from "Modules/CustomEvents";
 import LevelController from "Components/LevelController";
 import { Position2d, Attacker, EntityData } from "Game";
@@ -139,7 +140,7 @@ export default class BasicMonsterAi extends CustomJSComponent implements Attacke
 
                     // Let's defer the movement to the next update so we have time
                     // to wire up the resolve.
-                    this.deferAction(() => {
+                    this.deferUntilUpdate(() => {
                         this.node.sendEvent(MoveEntityByOffsetEventData({
                             position: [dir[0], dir[1]]
                         }));
@@ -178,7 +179,7 @@ export default class BasicMonsterAi extends CustomJSComponent implements Attacke
 
                         // Let's defer the movement to the next update so we have time
                         // to wire up the resolve.
-                        this.deferAction(() => {
+                        this.deferUntilUpdate(() => {
                             this.node.sendEvent(MoveEntityByOffsetEventData({
                                 position: targetPos
                             }));
@@ -200,7 +201,19 @@ export default class BasicMonsterAi extends CustomJSComponent implements Attacke
             if (waitForMove) {
                 return {
                     then: (resolve) => {
-                        this.deferAction(resolve, ActionCompleteEventType, this.node);
+                        this.deferUntilEvent(() => {
+                            // Let the update loop happen and then resolve
+                            this.DEBUG("moving");
+                            this.deferUntilUpdate(resolve);
+                        }, ActionCompleteEventType);
+                    }
+                };
+            } else {
+                return {
+                    then: (resolve) => {
+                        // Let the update loop happen and then resolve
+                        this.DEBUG("waiting");
+                        this.deferUntilUpdate(resolve);
                     }
                 };
             }
@@ -273,7 +286,8 @@ export default class BasicMonsterAi extends CustomJSComponent implements Attacke
     onDestroy() {
         this.DEBUG("Destroy");
         this.alive = false;
-        this.deferAction(() => {
+        this.sendEvent(DeregisterActorAiEventData({ ai: this }));
+        this.deferUntilUpdate(() => {
             Atomic.destroy(this.node);
         });
     }

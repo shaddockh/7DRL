@@ -10,9 +10,10 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+var CustomEvents_1 = require("../Modules/CustomEvents");
 var CustomJSComponent_1 = require("Modules/CustomJSComponent");
 var ROT = require("rot");
-var CustomEvents_1 = require("Modules/CustomEvents");
+var CustomEvents_2 = require("Modules/CustomEvents");
 "atomic component";
 var LevelController = (function (_super) {
     __extends(LevelController, _super);
@@ -27,10 +28,12 @@ var LevelController = (function (_super) {
         return _this;
     }
     LevelController.prototype.start = function () {
-        this.subscribeToEvent(CustomEvents_1.LoadLevelEvent(this.loadLevel.bind(this)));
-        this.subscribeToEvent(CustomEvents_1.RegisterActorAiEvent(this.registerActor.bind(this)));
-        this.subscribeToEvent(CustomEvents_1.DeregisterActorAiEvent(this.deregisterActor.bind(this)));
-        this.sendEvent(CustomEvents_1.SceneReadyEventData());
+        var _this = this;
+        this.subscribeToEvent(CustomEvents_2.LoadLevelEvent(this.loadLevel.bind(this)));
+        this.subscribeToEvent(CustomEvents_2.RegisterActorAiEvent(this.registerActor.bind(this)));
+        this.subscribeToEvent(CustomEvents_2.DeregisterActorAiEvent(this.deregisterActor.bind(this)));
+        this.subscribeToEvent(CustomEvents_1.PlayerDiedEvent(function () { return _this.scheduler.clear(); }));
+        this.sendEvent(CustomEvents_2.SceneReadyEventData());
     };
     LevelController.prototype.registerActor = function (data) {
         this.DEBUG("Actor registered with scheduler");
@@ -44,11 +47,10 @@ var LevelController = (function (_super) {
         this.scheduler.remove(data.ai);
     };
     LevelController.prototype.loadLevel = function (eventData) {
-        var _this = this;
         this.DEBUG("Loading new level");
         this.currentLevel = eventData.level;
         this.currentDepth = eventData.depth;
-        this.sendEvent(CustomEvents_1.RenderCurrentLevelEventData());
+        this.sendEvent(CustomEvents_2.RenderCurrentLevelEventData());
         if (!this.engine) {
             this.scheduler = new ROT.Scheduler.Simple();
             this.engine = new ROT.Engine(this.scheduler);
@@ -58,19 +60,17 @@ var LevelController = (function (_super) {
         else {
             this.scheduler.clear();
         }
-        this.sendEvent(CustomEvents_1.PlayerAttributeChangedEventData({
+        this.sendEvent(CustomEvents_2.PlayerAttributeChangedEventData({
             name: "depth",
             value: eventData.depth
         }));
         // Let's let eveything load an then unlock the engine
-        this.deferAction(function () {
-            _this.DEBUG("Asking all entities to register themselves");
-            _this.sendEvent(CustomEvents_1.RegisterLevelActorsEventData({
-                levelController: _this
-            }));
-            _this.DEBUG("Unlocking engine");
-            _this.engine.unlock();
-        });
+        this.DEBUG("Asking all entities to register themselves");
+        this.sendEvent(CustomEvents_2.RegisterLevelActorsEventData({
+            levelController: this
+        }));
+        this.DEBUG("Unlocking engine");
+        this.engine.unlock();
         // one-time 
         // this.sendEvent(PlayerActionBeginEventData());
     };

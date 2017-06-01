@@ -48,7 +48,7 @@ var Heart = (function (_super) {
                 message: "You feel healthier!"
             }));
             this.node.sendEvent(CustomEvents_2.DestroyEntityEventData());
-            this.deferAction(function () { return Atomic.destroy(_this.node); });
+            this.deferUntilUpdate(function () { return Atomic.destroy(_this.node); });
         }
     };
     return Heart;

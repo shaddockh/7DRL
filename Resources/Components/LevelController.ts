@@ -1,4 +1,4 @@
-import { PlayerAttributeChangedEvent } from "../Modules/CustomEvents";
+import { PlayerAttributeChangedEvent, PlayerDiedEvent } from "../Modules/CustomEvents";
 import CustomJSComponent from "Modules/CustomJSComponent";
 import { LevelMap } from "Modules/LevelGen/LevelMap";
 import * as ROT from "rot";
@@ -32,6 +32,7 @@ export default class LevelController extends CustomJSComponent {
         this.subscribeToEvent(LoadLevelEvent(this.loadLevel.bind(this)));
         this.subscribeToEvent(RegisterActorAiEvent(this.registerActor.bind(this)));
         this.subscribeToEvent(DeregisterActorAiEvent(this.deregisterActor.bind(this)));
+        this.subscribeToEvent(PlayerDiedEvent(() => this.scheduler.clear()));
         this.sendEvent(SceneReadyEventData());
     }
 
@@ -71,15 +72,13 @@ export default class LevelController extends CustomJSComponent {
         }));
 
         // Let's let eveything load an then unlock the engine
-        this.deferAction(() => {
-            this.DEBUG("Asking all entities to register themselves");
-            this.sendEvent(RegisterLevelActorsEventData({
-                levelController: this
-            }));
+        this.DEBUG("Asking all entities to register themselves");
+        this.sendEvent(RegisterLevelActorsEventData({
+            levelController: this
+        }));
 
-            this.DEBUG("Unlocking engine");
-            this.engine.unlock();
-        });
+        this.DEBUG("Unlocking engine");
+        this.engine.unlock();
 
         // one-time 
         // this.sendEvent(PlayerActionBeginEventData());

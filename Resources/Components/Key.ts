@@ -31,7 +31,7 @@ export default class Key extends CustomJSComponent {
             this.node.sendEvent(LogMessageEventData({ message: "You found a key!" }));
             this.node.sendEvent(KeyPickedUpEventData({ keyId: this.keyId }));
             this.node.sendEvent(DestroyEntityEventData());
-            this.deferAction(() => Atomic.destroy(this.node));
+            this.deferUntilUpdate(() => Atomic.destroy(this.node));
         }
     }
 }
